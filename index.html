@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel Mod Menu Ultimate - PRO</title>
+    <title>Painel Mod Menu Ultimate - PRO (TESTE)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
@@ -11,11 +11,11 @@
         /* === CONFIGURAÇÕES VISUAIS (IOS NEON PRO) === */
         :root {
             --primary-color: #9d00ff; /* Roxo Neon Principal */
-            --secondary-color: #39ff14; /* NOVO VERDE ELÉTRICO (Mais legível) */
+            --secondary-color: #39ff14; /* NOVO VERDE ELÉTRICO */
             --bg-color: #000000; 
             --panel-bg-blur: rgba(255, 255, 255, 0.08); 
             --text-color: #ffffff;
-            --secondary-text-color: #b0b0b0;
+            --secondary-color-text: #b0b0b0;
             --danger-color: #ff3b30; 
             --ios-radius: 12px; 
             --sutil-glow: 0 0 3px rgba(255, 255, 255, 0.3); 
@@ -62,6 +62,7 @@
             border: none; border-radius: 20px; 
             box-shadow: inset 0 0 10px rgba(157, 0, 255, 0.1), 0 8px 60px 0 rgba(0, 0, 0, 0.6); 
             display: flex; flex-direction: column; position: relative; z-index: 1; overflow: hidden; padding-bottom: 0; 
+            transition: all 0.5s ease-out; 
         }
         
         /* EFEITO LINHAS/ESTRELAS DENTRO DO PAINEL */
@@ -72,37 +73,89 @@
         }
         @keyframes lineScroll { from { background-position: 0 0; } to { background-position: 800px 800px; } }
 
-        /* === ABAS DE NAVEGAÇÃO COM ÍCONES REALISTAS === */
-        /* MODIFICAÇÃO: Posicionamento Fixo no Canto Superior Direito */
+        /* ESTADO DE CONCLUÍDO (Tela de transição) */
+        .panel-container.success-hide {
+            /* Mantém o painel visível, mas desabilitado */
+            opacity: 1; 
+            transform: scale(1);
+            pointer-events: none;
+        }
+
+        #success-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        #success-overlay.show { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-icon {
+            font-size: 100px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            animation: shieldPulse 3s infinite ease-in-out; 
+            text-shadow: 0 0 20px var(--secondary-color), 0 0 40px rgba(57, 255, 20, 0.5);
+        }
+        .success-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+            text-shadow: 0 0 10px var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        .success-subtext {
+            color: var(--secondary-color-text);
+            font-size: 16px;
+        }
+
+
+        /* === OVERLAY DE EXPIRAÇÃO (REMOVÍDO TEMPORARIAMENTE) === */
+        #expiration-overlay {
+            /* Está mantido na estrutura, mas nunca será exibido no modo de teste */
+            display: none !important; 
+        }
+
+
+        /* === ABAS DE NAVEGAÇÃO === */
         .tabs-header {
-            /* display: flex; REMOVIDO para layout vertical */
-            display: flex; /* Mantido, mas ajustado com flex-direction: column */
-            flex-direction: column; /* Novo: Alinha verticalmente */
-            position: absolute; /* Novo: Permite posicionamento */
-            top: 0; /* Novo: Alinha no topo */
-            right: 0; /* Novo: Alinha à direita */
-            width: 60px; /* Novo: Largura estreita para coluna de abas */
-            height: auto; /* Novo: Altura automática */
-            background: rgba(0,0,0,0.7); /* Fundo mais escuro para destaque */
-            border-radius: 0 20px 0 20px; /* Borda ajustada para o canto */
-            padding: 10px 0; /* Ajusta o padding vertical */
-            border-bottom: none; /* Remove borda inferior */
-            border-left: 1px solid rgba(255, 255, 255, 0.1); /* Borda esquerda */
-            z-index: 10; /* Garante que fique acima do conteúdo */
+            display: flex; 
+            flex-direction: column; 
+            position: absolute; 
+            top: 0; 
+            right: 0; 
+            width: 60px; 
+            height: auto; 
+            background: rgba(0,0,0,0.7); 
+            border-radius: 0 20px 0 20px; 
+            padding: 10px 0; 
+            border-left: 1px solid rgba(255, 255, 255, 0.1); 
+            z-index: 10; 
         }
 
         .tab-btn {
-            flex: none; /* Novo: Remove a flexibilidade */
-            width: 100%; /* Novo: Ocupa a largura total da coluna */
-            background: none; border: none; padding: 10px 0; /* Ajusta o padding horizontal */
-            color: var(--secondary-text-color); cursor: pointer; display: flex;
-            flex-direction: column; align-items: center; font-size: 10px; /* Fonte menor para caber */
-            font-weight: 500; transition: 0.3s; border-radius: 0; /* Remove o border-radius para preenchimento vertical */
+            flex: none; 
+            width: 100%; 
+            background: none; border: none; padding: 10px 0; 
+            color: var(--secondary-color-text); cursor: pointer; display: flex;
+            flex-direction: column; align-items: center; font-size: 10px; 
+            font-weight: 500; transition: 0.3s; border-radius: 0; 
             text-shadow: none;
-            margin-bottom: 5px; /* Espaçamento entre botões */
+            margin-bottom: 5px; 
         }
-        .tab-btn:first-child { margin-top: 5px; } /* Pequeno ajuste no primeiro */
-        .tab-btn:last-child { margin-bottom: 5px; } /* Pequeno ajuste no último */
+        .tab-btn:first-child { margin-top: 5px; } 
+        .tab-btn:last-child { margin-bottom: 5px; } 
 
 
         .tab-btn i { 
@@ -110,9 +163,8 @@
             font-size: 18px; margin-bottom: 4px; line-height: 1;
             filter: grayscale(80%) brightness(120%); 
             transition: all 0.3s ease-in-out;
-            color: var(--secondary-text-color); 
+            color: var(--secondary-color-text); 
         }
-        .tab-btn span.tab-emoji { display: none; }
         
         .tab-btn.active i { 
             filter: none; 
@@ -122,21 +174,20 @@
         }
         .tab-btn.active {
             color: var(--text-color);
-            background: rgba(157, 0, 255, 0.15); /* Fundo ativo mais visível */
-            border-left: 3px solid var(--primary-color); /* Indicador de aba ativa */
+            background: rgba(157, 0, 255, 0.15); 
+            border-left: 3px solid var(--primary-color); 
             border-radius: 0;
         }
 
         /* === ÁREA DE CONTEÚDO === */
-        /* MODIFICAÇÃO: Ajuste o padding para não ser coberto pela nova aba lateral */
         .content-body { flex: 1; padding: 20px 25px 20px 25px; overflow-y: auto; position: relative; } 
         .tab-content { display: none; flex-direction: column; gap: 15px; height: 100%; }
         .tab-content.active { display: flex; animation: fadeIn 0.3s; }
         
-        /* Adicionando padding para evitar sobreposição */
-        .content-body { padding-right: 70px; /* Deixa espaço para a aba de 60px + folga */ } 
+        /* Ajuste de padding para abas laterais */
+        .content-body { padding-right: 70px; } 
 
-        /* Cabeçalho da função (Sem alteração) */
+        /* Cabeçalho da função */
         .function-header {
             display: flex; align-items: center; padding-bottom: 15px;
             margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
@@ -148,14 +199,13 @@
             color: var(--primary-color); 
             transition: all 0.3s ease;
         }
-        .function-header span.func-header-emoji { display: block; } 
         .function-header .func-name {
             color: var(--text-color); font-weight: 600; text-transform: uppercase;
             margin-left: 5px; text-shadow: 0 0 4px var(--primary-color); 
         }
-        .function-header span { color: var(--secondary-text-color); font-size: 14px; font-weight: 400; }
+        .function-header span { color: var(--secondary-color-text); font-size: 14px; font-weight: 400; }
         
-        /* === MÓDULO DE CLIQUE PERFEITO (CONTROLES) === (Sem alteração) */
+        /* === MÓDULO DE CLIQUE PERFEITO (CONTROLES) === */
         .control-row {
             background: rgba(255, 255, 255, 0.05); 
             padding: 14px; border-radius: var(--ios-radius);
@@ -175,7 +225,7 @@
             text-shadow: 0 0 5px var(--secondary-color);
         }
 
-        /* Toggle Switch (Sem alteração) */
+        /* Toggle Switch */
         .switch { position: relative; display: inline-block; width: 48px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; } 
         .control-row .switch, .control-row .switch input, .control-row .switch .slider { pointer-events: none; }
@@ -191,7 +241,7 @@
             transform: translateX(20px); 
         }
 
-        /* Range Slider (Sem alteração) */
+        /* Range Slider */
         input[type=range] { width: 100%; height: 5px; background: #555; border-radius: 5px; outline: none; -webkit-appearance: none; margin-top: 10px; border: none; }
         input[type=range]::-webkit-slider-thumb { 
             -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; 
@@ -199,7 +249,7 @@
             box-shadow: 0 0 15px rgba(57, 255, 20, 0.8), 0 0 5px rgba(0,0,0,0.5); 
         }
 
-        /* Botões (Sem alteração) */
+        /* Botões */
         .btn { width: 100%; padding: 15px; margin-bottom: 10px; background: rgba(157, 0, 255, 0.2); border: 1px solid var(--primary-color); color: white; border-radius: var(--ios-radius); font-weight: 600; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 14px; box-shadow: 0 4px 15px rgba(157, 0, 255, 0.1); text-shadow: var(--sutil-glow); }
         .btn:active { transform: scale(0.99); background: rgba(157, 0, 255, 0.3); }
         .btn i { margin-right: 8px; font-size: 16px; color: rgba(255, 255, 255, 0.7); } 
@@ -214,8 +264,7 @@
         .btn-action:hover { background: #7b00cc; }
         .btn-action i { color: #fff; text-shadow: 0 0 5px rgba(255, 255, 255, 0.7); }
 
-
-        /* === ANIMAÇÕES PARA O ANTIBAN (NOVAS) === (Sem alteração) */
+        /* ABA ANTIBAN */
         @keyframes shieldPulse {
             0% { transform: scale(1); box-shadow: 0 0 10px var(--secondary-color); opacity: 0.9; }
             50% { transform: scale(1.05); box-shadow: 0 0 25px var(--secondary-color), 0 0 10px rgba(255, 255, 255, 0.8); opacity: 1; }
@@ -233,8 +282,6 @@
             100% { left: -100%; }
         }
 
-
-        /* ABA ANTIBAN (Sem alteração) */
         .antiban-emoji-large {
             font-size: 70px; background: rgba(57, 255, 20, 0.1); 
             padding: 20px; border-radius: 50%; margin-bottom: 10px;
@@ -242,20 +289,19 @@
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.7); 
             line-height: 1; display: inline-block;
             color: var(--secondary-color); 
-            animation: shieldPulse 3s infinite ease-in-out; /* Aplica o pulso */
+            animation: shieldPulse 3s infinite ease-in-out; 
         }
         #antiban h2 { 
             font-size:24px; font-weight: 700; color:var(--secondary-color); 
             text-shadow: 0 0 8px var(--secondary-color); 
             margin-top: 10px; margin-bottom: 5px; text-transform: uppercase; 
-            animation: textGlow 2.5s infinite ease-in-out; /* Aplica o brilho */
+            animation: textGlow 2.5s infinite ease-in-out; 
         }
         .antiban-details { 
             background:rgba(255, 255, 255, 0.05); padding:15px; border-radius:var(--ios-radius); border:1px solid rgba(255, 255, 255, 0.1); font-size:12px; text-shadow: var(--sutil-glow); 
             position: relative;
-            overflow: hidden; /* Garante que a linha de scan fique contida */
+            overflow: hidden; 
         }
-        /* Efeito de linha de varredura */
         .antiban-details::before {
             content: '';
             position: absolute;
@@ -268,14 +314,13 @@
             pointer-events: none;
         }
 
-        /* === MENSAGEM DE STATUS GLOBAL (POP-UP) - DISCRETO === (Sem alteração) */
+        /* === MENSAGEM DE STATUS GLOBAL (POP-UP) === */
         #status-message-container {
             position: fixed; 
             bottom: 70px; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 100; 
-            
             background: none; 
             padding: 12px 20px;
             border-radius: var(--ios-radius);
@@ -286,13 +331,10 @@
             transition: opacity 0.3s, visibility 0.3s;
             max-width: 90%;
             text-align: center;
-            
-            border: none; 
-            box-shadow: none; 
         }
         #status-message-container.show { opacity: 1; visibility: visible; }
         
-        /* ABA INJECTOR - AJUSTADO (Sem alteração) */
+        /* ABA INJECTOR */
         .status-card { 
             background: rgba(0,0,0,0.3); border: 1px solid #555; border-radius: var(--ios-radius); 
             padding: 20px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); 
@@ -308,9 +350,9 @@
             color: #ccc; font-weight: 600; font-size: 16px; margin: 0 0 5px 0; 
             text-shadow: var(--sutil-glow); transition: all 0.4s; 
         }
-        .status-card p { font-size: 11px; color: var(--secondary-text-color); }
+        .status-card p { font-size: 11px; color: var(--secondary-color-text); }
 
-        /* Barra de progresso (Sem alteração) */
+        /* Barra de progresso */
         .progress-bar-container {
             width: 100%; height: 5px; background-color: rgba(255, 255, 255, 0.1); 
             border-radius: 5px; margin-top: 10px; overflow: hidden;
@@ -321,7 +363,7 @@
             box-shadow: 0 0 10px var(--primary-color);
         }
 
-        /* Rodapé (Sem alteração) */
+        /* Rodapé */
         .footer-info { background: rgba(0,0,0,0.6); padding: 15px 25px; font-size: 11px; border-radius: 0 0 20px 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 2; }
         .footer-row { display: flex; justify-content: space-between; margin-bottom: 5px; text-shadow: var(--sutil-glow); }
         .online-tag { color: var(--secondary-color); font-weight: 700; text-shadow: 0 0 5px var(--secondary-color); }
@@ -332,7 +374,16 @@
 
     <input type="file" id="file-upload" style="display: none;" webkitdirectory directory>
 
-    <div class="panel-container">
+    <div id="success-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 50; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="success-text">SUCESSO! INJEÇÃO 100%</div>
+        <div class="success-subtext" id="overlay-subtext">Acesso de Teste Ilimitado. O comando de lançamento do jogo foi enviado.</div>
+    </div>
+    
+    <div id="expiration-overlay" style="display: none !important;">
+    </div>
+
+    <div class="panel-container" id="main-panel">
         
         <div class="tabs-header">
             <button class="tab-btn active" onclick="openTab('mira', this, 'MIRA', 'fa-crosshairs')">
@@ -361,7 +412,7 @@
             </div>
             
             <div id="mira" class="tab-content active">
-                <p style="font-size:12px; color:var(--secondary-text-color); margin-top:-10px; margin-bottom:15px; font-weight: 300;">Sistema de mira e estabilização avançada.</p>
+                <p style="font-size:12px; color:var(--secondary-color-text); margin-top:-10px; margin-bottom:15px; font-weight: 300;">Sistema de mira e estabilização avançada.</p>
                 
                 <div class="control-row" id="row-aimbot" onclick="handleToggle('checkbox-aimbot', 'row-aimbot', 'AIMBOT [360]')">
                     <span>AIMBOT [360]</span>
@@ -380,7 +431,7 @@
                 
                 <div style="margin-top:20px; padding: 10px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <small style="color:var(--secondary-text-color); font-weight: 500; text-shadow: none;">RAIO DE FOV DE MIRA</small>
+                        <small style="color:var(--secondary-color-text); font-weight: 500; text-shadow: none;">RAIO DE FOV DE MIRA</small>
                         <span id="fov-value" style="font-weight:700; color:var(--primary-color); text-shadow:0 0 5px var(--primary-color);">5</span>
                     </div>
                     <input type="range" id="fov-slider" min="1" max="10" value="5" step="1" oninput="updateFovValue(this.value)">
@@ -402,7 +453,7 @@
             </div>
 
             <div id="pasta" class="tab-content">
-                <h3 style="text-align:center; font-size:18px; color:var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color); margin-top:0; margin-bottom:25px; font-weight: 600;">SELEÇÃO DE VERSÃO</h3>
+                <h3 style="text-align:center; font-size:18px; color:var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color); margin-top:0; margin-bottom:25px; font-weight: 600;">SELEÇÃO DE VERSÃO E ARQUIVOS</h3>
 
                 <button id="btn-ff-normal" class="btn" onclick="selectGame('com.dts.freefireth', 'FREE FIRE NORMAL', true)">
                     <i class="fas fa-mobile-alt"></i> FREE FIRE NORMAL
@@ -414,15 +465,16 @@
                 <hr style="border:0; border-top:1px solid rgba(255, 255, 255, 0.1); width:100%; margin:20px 0;">
 
                 <button class="btn btn-action" onclick="triggerFile()">
-                    <i class="fas fa-upload"></i> INJETAR ARQUIVOS DA PASTA
+                    <i class="fas fa-upload"></i> CARREGAR PASTA DE RECURSOS
                 </button>
+                <p id="pasta-status" style="font-size:12px; color:var(--danger-color); text-align:center; margin-top:10px;">Status: Pasta de Arquivos não carregada.</p>
             </div>
 
             <div id="antiban" class="tab-content">
                 <div class="antiban-content" style="text-align: center;">
                     <span class="antiban-emoji-large"><i class="fas fa-shield-virus"></i></span> 
                     <h2>PROTEÇÃO ATIVA</h2>
-                    <p class="antiban-info" style="color:var(--secondary-text-color); font-size:13px;">Sistema de proteção em tempo real está totalmente operacional.</p> 
+                    <p class="antiban-info" style="color:var(--secondary-color-text); font-size:13px;">Sistema de proteção em tempo real está totalmente operacional.</p> 
                     <div class="antiban-details">
                         <div class="footer-row">
                             <span>BYPASS DE SEGURANÇA:</span> 
@@ -463,7 +515,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.2.5V</span>
+                <span>VERSÃO: 1.0.0.2.8V (TESTE ILIMITADO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -481,6 +533,36 @@
         let statusTimeout;
         let selectedGamePackage = null; 
         let selectedGameName = '';
+        let injectionInterval;
+        
+        // NO MODO DE TESTE ILIMITADO, O BLOQUEIO ESTÁ DESABILITADO
+        let licenseExpired = false; 
+
+        // Variável de controle da pasta
+        let pasta_carregada_com_sucesso = false; 
+
+        // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script.
+        // ** (REMOVIDO TEMPORARIAMENTE PARA TESTE) **
+        window.onload = function() {
+            // A lógica de bloqueio está desabilitada no modo de teste.
+            // Para reativar, descomente o bloco:
+            /*
+            if (localStorage.getItem('hasUsedTrial') === 'true') {
+                showPermanentLockScreen();
+            }
+            */
+        };
+        
+        // Função para abrir o link do Telegram em uma nova aba
+        function openTelegramLink() {
+            // SEU LINK DO TELEGRAM
+            const telegramURL = "https://t.me/+SF8t0VbWwFMwNWUx";
+            
+            // Abrir o link em uma nova aba forçada
+            window.open(telegramURL, '_blank').focus();
+            
+            showStatusMessage("✅ Redirecionando para o Telegram...", "var(--secondary-color)");
+        }
 
         function showStatusMessage(message, color) {
             const messageContainer = document.getElementById('status-message-container');
@@ -499,7 +581,15 @@
             }, 2500); 
         }
 
+        // FUNÇÃO: Controle de Toggles
         function handleToggle(checkboxId, rowId, functionName) {
+            // VERIFICAÇÃO DE EXPIRAÇÃO (REMOVIDO TEMPORARIAMENTE)
+            if (licenseExpired) {
+                // Esta função está desabilitada no modo de teste
+                // showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
+                return; 
+            }
+            
             const checkbox = document.getElementById(checkboxId);
             const row = document.getElementById(rowId);
             
@@ -572,20 +662,38 @@
 
         document.getElementById('file-upload').addEventListener('change', function(event) {
             const files = event.target.files;
+            const pastaStatus = document.getElementById('pasta-status');
+
             if (files.length > 0) {
-                showStatusMessage(`${files.length} arquivos prontos para Injeção.`, "var(--secondary-color)");
+                pasta_carregada_com_sucesso = true; 
+                pastaStatus.innerText = `Status: Pasta carregada com ${files.length} arquivos.`;
+                pastaStatus.style.color = "var(--secondary-color)";
+                showStatusMessage(`✅ PASTA CARREGADA. ${files.length} arquivos prontos.`, "var(--secondary-color)");
             } else {
-                showStatusMessage("Seleção cancelada.", "var(--danger-color)");
+                pasta_carregada_com_sucesso = false; 
+                pastaStatus.innerText = "Status: Pasta de Arquivos não carregada.";
+                pastaStatus.style.color = "var(--danger-color)";
+                showStatusMessage("Seleção de pasta cancelada.", "var(--danger-color)");
             }
         });
 
 
-        /* === FUNÇÃO DE INJEÇÃO === */
+        /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO TIMER APÓS O LANÇAMENTO) === */
         function startInjection(packageName, gameName) {
+            
+            // A verificação de expiração está desabilitada (licenseExpired = false)
+
+            if (injectionInterval) {
+                clearInterval(injectionInterval);
+            }
+            
             const indicator = document.getElementById('injector-status-indicator');
             const text = document.getElementById('status-text');
             const desc = document.getElementById('status-desc');
             const progressBar = document.getElementById('injection-progress-bar');
+            const mainPanel = document.getElementById('main-panel');
+            const successOverlay = document.getElementById('success-overlay');
+            const overlaySubtext = document.getElementById('overlay-subtext');
             
             selectedGamePackage = packageName; 
             selectedGameName = gameName;
@@ -611,70 +719,62 @@
                 { percent: 85, text: "Otimizando recursos (85%).", color: "var(--primary-color)" },
                 { percent: 90, text: "Finalizando Injeção - 90%.", color: "var(--secondary-color)" },
                 { percent: 95, text: "Limpeza de rastros finalizada.", color: "var(--primary-color)" },
-                { percent: 100, text: `INJEÇÃO CONCLUÍDA! Abrindo o ${gameName}...`, color: "var(--secondary-color)" }
+                { percent: 100, text: `INJEÇÃO CONCLUÍDA! Lançando o ${gameName}...`, color: "var(--secondary-color)" } 
             ];
 
             // 1. Resetar e Iniciar
             indicator.style.backgroundColor = 'var(--primary-color)';
-            indicator.style.boxShadow = `0 0 8px var(--primary-color)`;
+            indicator.style.boxShadow = '0 0 8px var(--primary-color)';
+            text.innerText = `INICIANDO INJEÇÃO: ${gameName}`;
+            desc.innerText = "Executando etapas...";
             progressBar.style.width = '0%';
             progressBar.style.backgroundColor = 'var(--primary-color)';
-            progressBar.style.boxShadow = `0 0 10px var(--primary-color)`;
-            
-            text.textContent = `INICIANDO PROCESSO...`;
-            desc.textContent = `Preparando injeção em: ${gameName}`;
-            showStatusMessage(`INJEÇÃO INICIADA: ${gameName}`, "var(--primary-color)");
 
             let stepIndex = 0;
+            
+            injectionInterval = setInterval(() => {
+                const currentProgress = progressSteps[stepIndex];
+                progressBar.style.width = `${currentProgress}%`;
 
-            function updateProgress() {
-                if (stepIndex >= statusStates.length) {
-                    // 3. Finalização: Abertura do Jogo (Simulado sem alerta)
+                const currentState = statusStates.find(s => s.percent === currentProgress);
+                if (currentState) {
+                    text.innerText = currentState.text;
+                    progressBar.style.backgroundColor = currentState.color;
+                }
+                
+                if (currentProgress === 100) {
+                    desc.innerText = "Processo finalizado com sucesso. Otimização aplicada.";
+                    clearInterval(injectionInterval); 
                     indicator.style.backgroundColor = 'var(--secondary-color)';
-                    indicator.style.boxShadow = `0 0 8px var(--secondary-color)`;
-                    desc.textContent = `O jogo ${selectedGameName} está sendo aberto agora.`;
+                    indicator.style.boxShadow = '0 0 8px var(--secondary-color)';
                     
-                    showStatusMessage(`ABRINDO JOGO... ${selectedGameName}`, "var(--secondary-color)");
-
-                    // Simula a abertura do jogo (o navegador tentaria abrir o URI)
+                    // 1. O sucesso aparece.
+                    overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo...`;
+                    successOverlay.style.display = 'flex';
+                    
+                    // 2. TENTA LANÇAR O APLICATIVO COM O COMANDO SIMPLIFICADO
                     setTimeout(() => {
-                        window.location.href = `${selectedGamePackage}://`; 
+                        const appPackage = selectedGamePackage; 
                         
-                        // Se o URI não funcionar (comum em navegadores), exibe um status final na tela
-                        setTimeout(() => {
-                            text.textContent = "INJEÇÃO ATIVA!";
-                            desc.textContent = "Volte ao jogo. Mod Menu funcionando perfeitamente.";
-                            showStatusMessage(`SUCESSO: ${selectedGameName} Pronto!`, "var(--secondary-color)");
-                        }, 500); 
+                        // *** COMANDO DIRETO PARA LANÇAMENTO DO JOGO ***
+                        const launchUri = `intent://#Intent;package=${appPackage};end`;
+                        
+                        window.location.href = launchUri; 
 
-                    }, 1000); 
+                        overlaySubtext.innerText = `Comando de lançamento do ${gameName} enviado! O jogo deve abrir em instantes.`;
+
+                        // *** TIMER DE EXPIRAÇÃO REMOVIDO PARA TESTES ***
+                        // Para reabilitar, insira: 
+                        // setTimeout(disableFunctions, 60000); // 60 segundos
+
+                    }, 1500); 
                     
-                    return;
+                    return; 
                 }
 
-                // 2. Animação progressiva (5 em 5%)
-                const currentState = statusStates[stepIndex];
-                progressBar.style.width = `${currentState.percent}%`;
-                progressBar.style.backgroundColor = currentState.color;
-                progressBar.style.boxShadow = `0 0 10px ${currentState.color}`;
-
-                text.textContent = currentState.text;
-                desc.textContent = `Injetando ${selectedGameName}... ${currentState.percent}%`;
-                
                 stepIndex++;
-                
-                // Simula o tempo de processamento
-                const delay = (currentState.percent < 50) ? 350 : 250; 
-                setTimeout(updateProgress, delay);
-            }
-
-            updateProgress();
+            }, 300); 
         }
-
-        // Inicializa a aba MIRA ao carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            openTab('mira', document.querySelector('.tab-btn.active'), 'MIRA', 'fa-crosshairs');
-        });
 
     </script>
 </body>
