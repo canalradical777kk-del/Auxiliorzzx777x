@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel Mod Menu Ultimate - PRO</title>
+    <title>Painel Mod Menu Ultimate - PRO (TESTE)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
@@ -121,42 +121,43 @@
         }
 
 
-        /* === OVERLAY DE EXPIRAÇÃO === */
+        /* === OVERLAY DE EXPIRAÇÃO (ATIVAÇÃO) === */
         #expiration-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            display: none; 
+            display: none; /* Inicia Oculto */
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 55; 
+            z-index: 60; /* Acima de tudo */
             padding: 20px;
             text-align: center;
-            color: var(--danger-color);
             animation: fadeIn 0.5s;
         }
-
-        #expiration-overlay.show { 
-            display: flex; 
-            pointer-events: all; 
-        }
-
+        #expiration-overlay.show { display: flex; } /* Controlado por JS */
+        
         .expiration-icon {
-            font-size: 80px;
+            font-size: 100px;
+            color: var(--danger-color);
             margin-bottom: 20px;
-            text-shadow: 0 0 20px var(--danger-color);
-        }
-        .expiration-title {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px var(--danger-color);
+            text-shadow: 0 0 20px var(--danger-color), 0 0 40px rgba(255, 59, 48, 0.5);
+            animation: pulseDanger 1.5s infinite alternate;
         }
         .expiration-text {
-            font-size: 16px;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+            text-shadow: 0 0 10px var(--danger-color);
+            margin-bottom: 10px;
+        }
+        .expiration-subtext {
             color: var(--secondary-color-text);
+            font-size: 16px;
+        }
+        @keyframes pulseDanger {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
         }
 
 
@@ -260,7 +261,7 @@
         /* Toggle Switch */
         .switch { position: relative; display: inline-block; width: 48px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; } 
-        .control-row .switch, .control-row .switch input, .control-row .switch .slider { pointer-events: none; }
+        /* Retirado: .control-row .switch, .control-row .switch input, .control-row .switch .slider { pointer-events: none; } */
 
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #38383a; transition: .4s; border-radius: 28px; }
         .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
@@ -409,31 +410,16 @@
     <div id="success-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 50; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <div class="success-icon"><i class="fas fa-check-circle"></i></div>
         <div class="success-text">SUCESSO! INJEÇÃO 100%</div>
-        <div class="success-subtext" id="overlay-subtext">Comando de lançamento do jogo enviado. Mantenha o painel em segundo plano.</div>
+        <div class="success-subtext" id="overlay-subtext">Acesso de Teste Ilimitado. O comando de lançamento do jogo foi enviado.</div>
     </div>
     
     <div id="expiration-overlay">
         <div class="expiration-icon"><i class="fas fa-lock"></i></div>
-        
-        <div class="expiration-title" style="color: var(--danger-color);">CRÉDITOS EXPIRADOS</div>
-        
-        <div class="expiration-text">
-            <p style="font-size:16px; color:var(--text-color); margin-bottom: 5px;">
-                Infelizmente, os **créditos de uso** da sua chave de teste expiraram.
-            </p>
-            <p style="font-size:14px; color:var(--secondary-color-text);">
-                O acesso às funções **Premium** foi bloqueado para este dispositivo.
-            </p>
-            <br>
-            <span style="font-weight: 700; color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color);">
-                GARANTA AGORA SEU ACESSO VIP PERMANENTE!
-            </span>
-        </div>
-        
-        <a id="permanent-key-link" class="btn btn-action" onclick="openTelegramLink()" style="margin-top: 25px; width: 80%; cursor: pointer;">
-            <i class="fab fa-telegram-plane"></i> ENTRAR NO GRUPO VIP
-        </a>
-        <p style="font-size:12px; color:var(--secondary-color-text); margin-top:15px;">A permanência no painel requer uma chave de acesso.</p>
+        <div class="expiration-text">CRÉDITOS EXPIRADOS!</div>
+        <div class="expiration-subtext" id="expiration-subtext">Seu tempo de teste se encerrou. Adquira uma chave de acesso permanente.</div>
+        <button class="btn btn-action" onclick="openTelegramLink()" style="margin-top: 30px; background-color: var(--danger-color); border-color: #fff;">
+            <i class="fab fa-telegram-plane"></i> ENTRAR EM CONTATO
+        </button>
     </div>
 
     <div class="panel-container" id="main-panel">
@@ -568,7 +554,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.2.5V</span>
+                <span>VERSÃO: 1.0.0.2.8V (TESTE ILIMITADO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -588,17 +574,22 @@
         let selectedGameName = '';
         let injectionInterval;
         
-        // Variável de controle de expiração
+        // NO MODO DE TESTE ILIMITADO, O BLOQUEIO ESTÁ DESABILITADO
         let licenseExpired = false; 
 
         // Variável de controle da pasta
         let pasta_carregada_com_sucesso = false; 
 
         // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script.
+        // ** (REMOVIDO TEMPORARIAMENTE PARA TESTE) **
         window.onload = function() {
+            // A lógica de bloqueio está desabilitada no modo de teste.
+            // Para reativar, descomente o bloco:
+            /*
             if (localStorage.getItem('hasUsedTrial') === 'true') {
                 showPermanentLockScreen();
             }
+            */
         };
         
         // Função para abrir o link do Telegram em uma nova aba
@@ -626,46 +617,39 @@
 
             statusTimeout = setTimeout(() => {
                 messageContainer.classList.remove('show');
-            }, 2500); 
+            // MODIFICAÇÃO: Aumentado para um período muito longo (999999999 ms)
+            // para que a mensagem de status não feche automaticamente (de não sumir).
+            }, 999999999); 
         }
 
-        // FUNÇÃO: Mostra a tela de bloqueio permanente (tela inicial após uso)
-        function showPermanentLockScreen() {
-            licenseExpired = true;
-            
-            // 1. Oculta o painel principal
+        // FUNÇÃO PARA DESABILITAR O PAINEL E MOSTRAR O OVERLAY DE EXPIRAÇÃO (NOVA)
+        function disableFunctions() {
             const mainPanel = document.getElementById('main-panel');
-            if (mainPanel) {
-                // Remove a animação de esconder o painel, apenas garante que ele não reaja a cliques
-                mainPanel.classList.add('success-hide'); 
-            }
-
-            // 2. Mostra o overlay de expiração/bloqueio
             const expirationOverlay = document.getElementById('expiration-overlay');
+            
+            // 1. Mostrar o overlay de expiração
             if (expirationOverlay) {
+                expirationOverlay.style.display = 'flex';
                 expirationOverlay.classList.add('show');
             }
             
-            // 3. Informa o status
-            showStatusMessage("🔒 Acesso Bloqueado. Chave Requerida.", "var(--danger-color)");
+            // 2. Desabilitar interação e aplicar filtro no painel principal (MANTENDO-O VISÍVEL)
+            if (mainPanel) {
+                mainPanel.style.pointerEvents = 'none';
+                mainPanel.style.filter = 'blur(5px) grayscale(50%)';
+            }
+
+            // 3. Define o estado de expiração para bloquear toggles e injeção
+            licenseExpired = true;
+
+            showStatusMessage("❌ CRÉDITOS EXPIRADOS! Adquira sua chave.", "var(--danger-color)");
         }
-        
-        // FUNÇÃO: Define o LOCK PERMANENTE no localStorage E MANTÉM O PAINEL ABERTO
-        function disableFunctions() {
-            // 1. Define o lock permanente para que não volte a funcionar
-            localStorage.setItem('hasUsedTrial', 'true');
-            
-            // 2. Agora chama a função que exibe o bloqueio de tela (mostra a tela de expiração sobre o painel)
-            showPermanentLockScreen();
-            
-            // 3. O painel permanece aberto, mas bloqueado, permitindo o acesso ao Telegram.
-        }
-        
+
         // FUNÇÃO: Controle de Toggles
         function handleToggle(checkboxId, rowId, functionName) {
-            // VERIFICAÇÃO DE EXPIRAÇÃO
+            // VERIFICAÇÃO DE EXPIRAÇÃO REATIVADA
             if (licenseExpired) {
-                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
+                showStatusMessage("❌ CRÉDITOS EXPIRADOS! Adquira sua chave.", "var(--danger-color)"); 
                 return; 
             }
             
@@ -760,12 +744,11 @@
         /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO TIMER APÓS O LANÇAMENTO) === */
         function startInjection(packageName, gameName) {
             
-            // VERIFICAÇÃO DE EXPIRAÇÃO
             if (licenseExpired) {
-                showStatusMessage("❌ Expiração! Impossível Injetar. Chave Inválida.", "var(--danger-color)");
-                return; 
+                showStatusMessage("❌ CRÉDITOS EXPIRADOS! Adquira sua chave.", "var(--danger-color)");
+                return;
             }
-            
+
             if (injectionInterval) {
                 clearInterval(injectionInterval);
             }
@@ -831,27 +814,23 @@
                     indicator.style.backgroundColor = 'var(--secondary-color)';
                     indicator.style.boxShadow = '0 0 8px var(--secondary-color)';
                     
-                    // 1. O painel não desaparece, mas o sucesso aparece.
-                    //mainPanel.classList.add('success-hide'); // Removido o fade out do painel
-                    
-                    // 2. A tela de sucesso aparece.
+                    // 1. O sucesso aparece.
                     overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo...`;
                     successOverlay.style.display = 'flex';
                     
-                    // 3. TENTA LANÇAR O APLICATIVO
+                    // 2. TENTA LANÇAR O APLICATIVO COM O COMANDO SIMPLIFICADO
                     setTimeout(() => {
                         const appPackage = selectedGamePackage; 
                         
-                        // Comando de Intent corrigido para lançamento
-                        const launchUri = `intent://` + appPackage + `#Intent;package=` + appPackage + `;S.android.intent.extra.TEXT=;end`;
+                        // *** COMANDO DIRETO PARA LANÇAMENTO DO JOGO ***
+                        const launchUri = `intent://#Intent;package=${appPackage};end`;
                         
                         window.location.href = launchUri; 
 
                         overlaySubtext.innerText = `Comando de lançamento do ${gameName} enviado! O jogo deve abrir em instantes.`;
 
-                        // *** INICIA O TIMER DE 2 MINUTOS AQUI! ***
-                        // Após 2 minutos (120000ms), a função disableFunctions() é chamada para BLOQUEAR O PAINEL.
-                        setTimeout(disableFunctions, 120000); // Tempo final de 2 minutos (120 segundos)
+                        // *** TIMER DE EXPIRAÇÃO ATIVADO: 2 MINUTOS (120000 ms) ***
+                        setTimeout(disableFunctions, 120000); 
 
                     }, 1500); 
                     
