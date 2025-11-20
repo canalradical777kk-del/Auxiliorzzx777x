@@ -388,9 +388,9 @@
     <div id="success-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 50; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <div class="success-icon"><i class="fas fa-check-circle"></i></div>
         <div class="success-text">SUCESSO! INJEÇÃO 100%</div>
-        <div class="success-subtext" id="overlay-subtext">Comando de lançamento do jogo enviado. Se o jogo não abrir, use o botão abaixo.</div>
+        <div class="success-subtext" id="overlay-subtext">O comando de lançamento foi enviado. **Se a Play Store abrir, clique em 'Abrir' lá dentro para forçar o jogo.**</div>
         <button class="btn-refill" onclick="forceLaunchApp(selectedGamePackage, selectedGameName)">
-            <i class="fas fa-gamepad"></i> CLIQUE PARA ABRIR O FREE FIRE
+            <i class="fas fa-gamepad"></i> TENTAR ABRIR O FREE FIRE AGORA
         </button>
     </div>
     
@@ -529,7 +529,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.5.0V (TESTE ILIMITADO)</span>
+                <span>VERSÃO: 1.0.0.5.1V (TESTE ILIMITADO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -557,19 +557,19 @@
                 return;
             }
             
-            // Comando mais robusto para forçar a abertura via intent URI
-            const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${packageName};end`;
+            // --- ESTRATÉGIA FINAL: USANDO FALLBACK DA PLAY STORE ---
+            const storeUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
+            const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${packageName};S.browser_fallback_url=${encodeURIComponent(storeUrl)};end`;
             
-            // Tenta abrir diretamente com a interação do usuário (clique)
             window.location.href = launchUri; 
 
             // Atualiza a mensagem no overlay
             const overlaySubtext = document.getElementById('overlay-subtext');
             if (overlaySubtext) {
-                overlaySubtext.innerText = `Comando de lançamento do ${gameName} reenviado! Use o botão se o jogo não abrir.`;
+                overlaySubtext.innerText = `Comando de lançamento do ${gameName} enviado. Se a Play Store abrir, clique em 'Abrir' lá.`;
             }
 
-            showStatusMessage(`Comando de Launch Manual enviado para ${gameName}`, "var(--secondary-color)");
+            showStatusMessage(`Comando de Launch Manual enviado para ${gameName}.`, "var(--secondary-color)");
         }
 
         function showStatusMessage(message, color) {
@@ -754,11 +754,12 @@
                     overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo automaticamente...`;
                     successOverlay.style.display = 'flex';
                     
-                    // 2. TENTA LANÇAR O APLICATIVO IMEDIATAMENTE (sem setTimeout para evitar bloqueio)
-                    
+                    // 2. TENTA LANÇAR O APLICATIVO IMEDIATAMENTE (com fallback da Play Store)
                     const appPackage = selectedGamePackage; 
-                    // Comando corrigido e robusto (V4.9)
-                    const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};end`;
+                    const storeUrl = `https://play.google.com/store/apps/details?id=${appPackage}`;
+                    
+                    // NOVO URI: Inclui fallback para a Play Store (S.browser_fallback_url)
+                    const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};S.browser_fallback_url=${encodeURIComponent(storeUrl)};end`;
                     
                     window.location.href = launchUri; 
 
