@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel Mod Menu Ultimate - PRO (TESTE)</title>
+    <title>Painel Mod Menu Ultimate - PRO (V5.4)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
-        /* [Seu CSS permanece o mesmo - omitido por brevidade] */
         /* === CONFIGURAÇÕES VISUAIS (IOS NEON PRO) === */
         :root {
             --primary-color: #9d00ff; /* Roxo Neon Principal */
@@ -74,14 +73,52 @@
         }
         @keyframes lineScroll { from { background-position: 0 0; } to { background-position: 800px 800px; } }
 
-        /* ESTADO DE CONCLUÍDO (Tela de transição) */
-        .panel-container.success-hide {
-            /* Mantém o painel visível, mas desabilitado */
-            opacity: 1; 
-            transform: scale(1);
-            pointer-events: none;
+        /* === NOVO ESTILO: OVERLAY DE LICENÇA EXPIRADA (Sutil) === */
+        #license-lock {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7); /* Transparente para ver o painel atrás */
+            display: none; /* Inicia oculto */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 55; /* Acima do painel e abaixo do status/sucesso */
+            padding: 20px;
+            text-align: center;
+            border-radius: 20px; /* Adapta ao painel */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            pointer-events: none; /* Inicia desabilitado */
         }
 
+        #license-lock.active { 
+            display: flex; 
+            pointer-events: all; /* Bloqueia cliques quando ativo */
+        }
+        
+        .lock-card {
+            background: rgba(40, 0, 0, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--danger-color);
+            box-shadow: 0 0 15px var(--danger-color);
+            max-width: 80%;
+        }
+
+        .lock-card h3 {
+            color: var(--danger-color);
+            font-size: 20px;
+            text-shadow: 0 0 10px var(--danger-color);
+            margin-top: 0;
+        }
+
+        .lock-card p {
+            color: #ffaaaa;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        /* ESTADO DE CONCLUÍDO (Tela de transição) */
         #success-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -131,13 +168,6 @@
             box-shadow: 0 0 20px var(--secondary-color);
         }
         .btn-refill:active { transform: scale(0.98); background: #28a745; }
-
-
-        /* === OVERLAY DE EXPIRAÇÃO (REMOVÍDO TEMPORARIAMENTE) === */
-        #expiration-overlay {
-            /* Está mantido na estrutura, mas nunca será exibido no modo de teste */
-            display: none !important; 
-        }
 
 
         /* === ABAS DE NAVEGAÇÃO === */
@@ -397,9 +427,20 @@
     
     <div id="expiration-overlay" style="display: none !important;">
     </div>
-
-    <div class="panel-container" id="main-panel">
+    
+    <div class="panel-container" id="main-panel"> 
         
+        <div id="license-lock">
+            <div class="lock-card">
+                <h3>ACESSO BLOQUEADO!</h3>
+                <p>O tempo de teste (2 minutos) expirou. Sua chave **KEY** acabou.</p>
+                <p>Dispositivo bloqueado permanentemente até a chave original ser inserida.</p>
+                <button class="btn btn-action" style="background: var(--danger-color);" onclick="promptForNewKey()">
+                    <i class="fas fa-key"></i> INSERIR CHAVE ORIGINAL
+                </button>
+            </div>
+        </div>
+
         <div class="tabs-header">
             <button class="tab-btn active" onclick="openTab('mira', this, 'MIRA', 'fa-crosshairs')">
                 <i class="fas fa-crosshairs"></i>
@@ -530,7 +571,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.5.2V (TESTE ILIMITADO)</span>
+                <span>VERSÃO: 1.0.0.5.4V (TESTE BLOQUEADO POR INJEÇÃO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -551,6 +592,43 @@
         let injectionInterval;
         let licenseExpired = false; 
         let pasta_carregada_com_sucesso = false; 
+        
+        /* === LÓGICA DE EXPIRAÇÃO DE TEMPO (2 MINUTOS) === */
+        const TEST_DURATION_SECONDS = 120; // 2 minutos
+        let expirationTimer;
+
+        function checkExpiration() {
+            const lockOverlay = document.getElementById('license-lock');
+            
+            // Ativa o bloqueio
+            licenseExpired = true; 
+            lockOverlay.classList.add('active'); 
+            
+            showStatusMessage("🛑 Tempo de Teste Expirou! Acesso Bloqueado. A Chave KEY acabou.", "var(--danger-color)");
+        }
+        
+        function promptForNewKey() {
+            // Chave de teste: CHAVEORIGINAL
+            const userKey = prompt("Insira a chave de acesso (KEY):");
+            
+            if (userKey && userKey.toUpperCase() === "CHAVEORIGINAL") {
+                alert("CHAVE ACEITA! Recarregando para reativar o acesso.");
+                location.reload(); 
+            } else if (userKey) {
+                alert("CHAVE INVÁLIDA ou EXPIRADA. Acesso Negado.");
+            }
+        }
+        
+        function startExpirationTimer() {
+            // Se o timer já estiver rodando ou a licença expirada, não faz nada.
+            if (expirationTimer || licenseExpired) return;
+
+            // Inicia a contagem regressiva de 2 minutos
+            expirationTimer = setTimeout(checkExpiration, TEST_DURATION_SECONDS * 1000); 
+            showStatusMessage(`⏰ Teste Ativado: 2 minutos de uso!`, "var(--primary-color)");
+        }
+
+        /* === FUNÇÕES DE UTILIDADE E CONTROLE === */
 
         function forceLaunchApp(packageName, gameName) {
             if (!packageName) {
@@ -591,7 +669,7 @@
 
         function handleToggle(checkboxId, rowId, functionName) {
             if (licenseExpired) {
-                // Mensagem de licença desativada no modo de teste
+                showStatusMessage("🛑 Chave Expirada. Acesso Negado.", "var(--danger-color)");
                 return; 
             }
             
@@ -658,6 +736,10 @@
         }
 
         function triggerFile() {
+            if (licenseExpired) {
+                showStatusMessage("🛑 Chave Expirada. Acesso Negado.", "var(--danger-color)");
+                return;
+            }
             const fileUpload = document.getElementById('file-upload');
             if (fileUpload) {
                 fileUpload.click();
@@ -685,6 +767,14 @@
 
         /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO LANÇAMENTO) === */
         function startInjection(packageName, gameName) {
+            
+            if (licenseExpired) {
+                showStatusMessage("🛑 Chave Expirada. Não é possível Injetar.", "var(--danger-color)");
+                return;
+            }
+            
+            // 1. ATIVA O TIMER DE 2 MINUTOS
+            startExpirationTimer(); 
             
             if (injectionInterval) {
                 clearInterval(injectionInterval);
@@ -724,7 +814,7 @@
                 { percent: 100, text: `INJEÇÃO CONCLUÍDA! Lançando o ${gameName}...`, color: "var(--secondary-color)" } 
             ];
 
-            // 1. Resetar e Iniciar
+            // 2. Resetar e Iniciar a injeção visual
             indicator.style.backgroundColor = 'var(--primary-color)';
             indicator.style.boxShadow = '0 0 8px var(--primary-color)';
             text.innerText = `INICIANDO INJEÇÃO: ${gameName}`;
@@ -750,10 +840,10 @@
                     indicator.style.backgroundColor = 'var(--secondary-color)';
                     indicator.style.boxShadow = '0 0 8px var(--secondary-color)';
                     
-                    // 1. O sucesso aparece.
+                    // 3. O sucesso aparece.
                     successOverlay.style.display = 'flex';
                     
-                    // 2. TENTA LANÇAR O APLICATIVO COM LÓGICA CONDICIONAL
+                    // 4. TENTA LANÇAR O APLICATIVO COM LÓGICA CONDICIONAL (V5.2)
                     const appPackage = selectedGamePackage; 
                     let launchUri;
                     let successMessage;
@@ -764,7 +854,7 @@
                         successMessage = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo diretamente...`;
 
                     } else if (appPackage === 'com.dts.freefiremax') {
-                        // LANÇAMENTO COM FALLBACK (FF MAX)
+                        // LANÇAMENTO COM FALLBACK (FF MAX - Play Store)
                         const storeUrl = `https://play.google.com/store/apps/details?id=${appPackage}`;
                         launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};S.browser_fallback_url=${encodeURIComponent(storeUrl)};end`;
                         successMessage = `O jogo ${gameName} foi injetado. Tentando abrir (pode abrir a Play Store).`;
