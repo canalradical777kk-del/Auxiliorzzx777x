@@ -120,6 +120,17 @@
             font-size: 16px;
         }
 
+        /* Novo botão de reforço no overlay */
+        .btn-refill {
+            width: 80%; padding: 15px; margin-top: 20px; 
+            background: var(--secondary-color); border: 2px solid var(--text-color); 
+            color: var(--bg-color); border-radius: var(--ios-radius); 
+            font-weight: 800; cursor: pointer; transition: 0.3s; 
+            text-transform: uppercase; font-size: 16px; 
+            box-shadow: 0 0 20px var(--secondary-color);
+        }
+        .btn-refill:active { transform: scale(0.98); background: #28a745; }
+
 
         /* === OVERLAY DE EXPIRAÇÃO (REMOVÍDO TEMPORARIAMENTE) === */
         #expiration-overlay {
@@ -377,7 +388,10 @@
     <div id="success-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 50; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <div class="success-icon"><i class="fas fa-check-circle"></i></div>
         <div class="success-text">SUCESSO! INJEÇÃO 100%</div>
-        <div class="success-subtext" id="overlay-subtext">Acesso de Teste Ilimitado. O comando de lançamento do jogo foi enviado.</div>
+        <div class="success-subtext" id="overlay-subtext">Comando de lançamento do jogo enviado. Se o jogo não abrir, use o botão abaixo.</div>
+        <button class="btn-refill" onclick="forceLaunchApp(selectedGamePackage, selectedGameName)">
+            <i class="fas fa-gamepad"></i> CLIQUE PARA ABRIR O FREE FIRE
+        </button>
     </div>
     
     <div id="expiration-overlay" style="display: none !important;">
@@ -515,11 +529,11 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.2.9V (TESTE ILIMITADO)</span>
+                <span>VERSÃO: 1.0.0.5.0V (TESTE ILIMITADO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
-                <span>DATA: 19/11/25</span>
+                <span>DATA: 20/11/25</span>
             </div>
         </div>
 
@@ -534,22 +548,28 @@
         let selectedGamePackage = null; 
         let selectedGameName = '';
         let injectionInterval;
-        
-        // NO MODO DE TESTE ILIMITADO, O BLOQUEIO ESTÁ DESABILITADO
         let licenseExpired = false; 
-
-        // Variável de controle da pasta
         let pasta_carregada_com_sucesso = false; 
 
-        // Função para abrir o link do Telegram em uma nova aba
-        function openTelegramLink() {
-            // SEU LINK DO TELEGRAM
-            const telegramURL = "https://t.me/+SF8t0VbWwFMwNWUx";
+        function forceLaunchApp(packageName, gameName) {
+            if (!packageName) {
+                showStatusMessage("❌ Erro: Selecione a versão do jogo primeiro.", "var(--danger-color)");
+                return;
+            }
             
-            // Abrir o link em uma nova aba forçada
-            window.open(telegramURL, '_blank').focus();
+            // Comando mais robusto para forçar a abertura via intent URI
+            const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${packageName};end`;
             
-            showStatusMessage("✅ Redirecionando para o Telegram...", "var(--secondary-color)");
+            // Tenta abrir diretamente com a interação do usuário (clique)
+            window.location.href = launchUri; 
+
+            // Atualiza a mensagem no overlay
+            const overlaySubtext = document.getElementById('overlay-subtext');
+            if (overlaySubtext) {
+                overlaySubtext.innerText = `Comando de lançamento do ${gameName} reenviado! Use o botão se o jogo não abrir.`;
+            }
+
+            showStatusMessage(`Comando de Launch Manual enviado para ${gameName}`, "var(--secondary-color)");
         }
 
         function showStatusMessage(message, color) {
@@ -558,10 +578,10 @@
             
             messageContainer.innerText = message;
             messageContainer.style.color = color;
-            messageContainer.style.boxShadow = `none`; 
+            messageContainer.style.boxShadow = `0 0 15px rgba(255, 255, 255, 0.1)`; 
             messageContainer.style.borderColor = `transparent`; 
             messageContainer.style.textShadow = `0 0 5px ${color}`; 
-            messageContainer.style.background = `none`; 
+            messageContainer.style.background = `rgba(0,0,0,0.8)`; 
             messageContainer.classList.add('show');
 
             statusTimeout = setTimeout(() => {
@@ -569,12 +589,9 @@
             }, 2500); 
         }
 
-        // FUNÇÃO: Controle de Toggles
         function handleToggle(checkboxId, rowId, functionName) {
-            // VERIFICAÇÃO DE EXPIRAÇÃO (REMOVIDO TEMPORARIAMENTE)
             if (licenseExpired) {
-                // Esta função está desabilitada no modo de teste
-                // showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
+                // Mensagem de licença desativada no modo de teste
                 return; 
             }
             
@@ -666,11 +683,9 @@
         });
 
 
-        /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO TIMER APÓS O LANÇAMENTO) === */
+        /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO LANÇAMENTO) === */
         function startInjection(packageName, gameName) {
             
-            // A verificação de expiração está desabilitada (licenseExpired = false)
-
             if (injectionInterval) {
                 clearInterval(injectionInterval);
             }
@@ -679,7 +694,6 @@
             const text = document.getElementById('status-text');
             const desc = document.getElementById('status-desc');
             const progressBar = document.getElementById('injection-progress-bar');
-            const mainPanel = document.getElementById('main-panel');
             const successOverlay = document.getElementById('success-overlay');
             const overlaySubtext = document.getElementById('overlay-subtext');
             
@@ -737,26 +751,17 @@
                     indicator.style.boxShadow = '0 0 8px var(--secondary-color)';
                     
                     // 1. O sucesso aparece.
-                    overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo...`;
+                    overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo automaticamente...`;
                     successOverlay.style.display = 'flex';
                     
-                    // 2. TENTA LANÇAR O APLICATIVO COM O COMANDO CORRIGIDO
-                    setTimeout(() => {
-                        const appPackage = selectedGamePackage; 
-                        
-                        // *** COMANDO CORRIGIDO: Adiciona action e category para forçar o launch. ***
-                        const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};end`;
-                        
-                        window.location.href = launchUri; 
-
-                        overlaySubtext.innerText = `Comando de lançamento do ${gameName} enviado! O jogo deve abrir em instantes.`;
-
-                        // *** TIMER DE EXPIRAÇÃO REMOVIDO PARA TESTES ***
-                        // Para reabilitar, insira: 
-                        // setTimeout(disableFunctions, 60000); // 60 segundos
-
-                    }, 1500); 
+                    // 2. TENTA LANÇAR O APLICATIVO IMEDIATAMENTE (sem setTimeout para evitar bloqueio)
                     
+                    const appPackage = selectedGamePackage; 
+                    // Comando corrigido e robusto (V4.9)
+                    const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};end`;
+                    
+                    window.location.href = launchUri; 
+
                     return; 
                 }
 
