@@ -73,12 +73,13 @@
         }
         @keyframes lineScroll { from { background-position: 0 0; } to { background-position: 800px 800px; } }
 
-        /* ESTADO DE CONCLUÍDO (Tela de transição) */
+        /* ESTADO DE CONCLUÍDO / BLOQUEADO */
         .panel-container.success-hide {
             /* Mantém o painel visível, mas desabilitado */
             opacity: 1; 
             transform: scale(1);
             pointer-events: none;
+            filter: blur(10px); /* Adiciona um leve desfoque ao fundo */
         }
 
         #success-overlay {
@@ -261,7 +262,7 @@
         /* Toggle Switch */
         .switch { position: relative; display: inline-block; width: 48px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; } 
-        /* Retirado: .control-row .switch, .control-row .switch input, .control-row .switch .slider { pointer-events: none; } */
+        .control-row .switch, .control-row .switch input, .control-row .switch .slider { pointer-events: none; }
 
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #38383a; transition: .4s; border-radius: 28px; }
         .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
@@ -414,11 +415,11 @@
     </div>
     
     <div id="expiration-overlay">
-        <div class="expiration-icon"><i class="fas fa-lock"></i></div>
-        <div class="expiration-text">CRÉDITOS EXPIRADOS!</div>
-        <div class="expiration-subtext" id="expiration-subtext">Seu tempo de teste se encerrou. Adquira uma chave de acesso permanente.</div>
-        <button class="btn btn-action" onclick="openTelegramLink()" style="margin-top: 30px; background-color: var(--danger-color); border-color: #fff;">
-            <i class="fab fa-telegram-plane"></i> ENTRAR EM CONTATO
+        <div class="expiration-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="expiration-text">CRÉDITOS EXPIRADOS</div>
+        <div class="expiration-subtext" id="lock-reason-text">O tempo de teste de 2 minutos expirou. A chave de acesso é necessária.</div>
+        <button class="btn btn-action" onclick="openTelegramLink()" style="margin-top: 30px; background: var(--danger-color); border-color: #ff8580;">
+            <i class="fab fa-telegram-plane"></i> OBTER CHAVE PERMANENTE
         </button>
     </div>
 
@@ -554,7 +555,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.2.8V (TESTE ILIMITADO)</span>
+                <span>VERSÃO: 1.0.0.2.8V (TESTE TEMPORÁRIO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -574,22 +575,18 @@
         let selectedGameName = '';
         let injectionInterval;
         
-        // NO MODO DE TESTE ILIMITADO, O BLOQUEIO ESTÁ DESABILITADO
+        // NO MODO DE TESTE, O BLOQUEIO É CONTROLADO PELO TIMER E LOCALSTORAGE
         let licenseExpired = false; 
 
         // Variável de controle da pasta
         let pasta_carregada_com_sucesso = false; 
 
-        // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script.
-        // ** (REMOVIDO TEMPORARIAMENTE PARA TESTE) **
+        // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script. (REATIVADO)
         window.onload = function() {
-            // A lógica de bloqueio está desabilitada no modo de teste.
-            // Para reativar, descomente o bloco:
-            /*
+            // A lógica de bloqueio agora está ativada.
             if (localStorage.getItem('hasUsedTrial') === 'true') {
                 showPermanentLockScreen();
             }
-            */
         };
         
         // Função para abrir o link do Telegram em uma nova aba
@@ -617,39 +614,53 @@
 
             statusTimeout = setTimeout(() => {
                 messageContainer.classList.remove('show');
-            // MODIFICAÇÃO: Aumentado para um período muito longo (999999999 ms)
-            // para que a mensagem de status não feche automaticamente (de não sumir).
-            }, 999999999); 
+            }, 2500); 
         }
 
-        // FUNÇÃO PARA DESABILITAR O PAINEL E MOSTRAR O OVERLAY DE EXPIRAÇÃO (NOVA)
-        function disableFunctions() {
+        // FUNÇÃO: Exibe a tela de Expiração
+        function showExpirationOverlay(reason) {
+            const overlay = document.getElementById('expiration-overlay');
             const mainPanel = document.getElementById('main-panel');
-            const expirationOverlay = document.getElementById('expiration-overlay');
+            const lockReasonText = document.getElementById('lock-reason-text');
             
-            // 1. Mostrar o overlay de expiração
-            if (expirationOverlay) {
-                expirationOverlay.style.display = 'flex';
-                expirationOverlay.classList.add('show');
+            if(lockReasonText) {
+                lockReasonText.innerText = reason;
             }
-            
-            // 2. Desabilitar interação e aplicar filtro no painel principal (MANTENDO-O VISÍVEL)
+
+            // O painel principal continua visível, mas sem interação
             if (mainPanel) {
-                mainPanel.style.pointerEvents = 'none';
-                mainPanel.style.filter = 'blur(5px) grayscale(50%)';
+                mainPanel.classList.add('success-hide');
             }
-
-            // 3. Define o estado de expiração para bloquear toggles e injeção
-            licenseExpired = true;
-
-            showStatusMessage("❌ CRÉDITOS EXPIRADOS! Adquira sua chave.", "var(--danger-color)");
+            
+            overlay.classList.add('show'); 
+            overlay.style.display = 'flex'; 
+            licenseExpired = true; 
         }
+
+        // FUNÇÃO: Exibe a tela de Bloqueio Permanente (usada no window.onload)
+        function showPermanentLockScreen() {
+            showExpirationOverlay("Esta chave de teste já foi utilizada neste dispositivo. Bloqueio permanente ativado.");
+            // Impede rolagem e interação com o painel principal
+            const mainPanel = document.getElementById('main-panel');
+            if (mainPanel) {
+                mainPanel.classList.add('success-hide'); 
+            }
+        }
+        
+        // FUNÇÃO: É chamada quando o timer de 2 minutos se esgota.
+        function disableFunctions() {
+            // Define o flag de uso permanente no localStorage. Isso bloqueia o acesso futuro.
+            localStorage.setItem('hasUsedTrial', 'true');
+            
+            showExpirationOverlay("O tempo de teste de 2 minutos expirou. A chave de acesso é necessária.");
+        }
+
 
         // FUNÇÃO: Controle de Toggles
         function handleToggle(checkboxId, rowId, functionName) {
             // VERIFICAÇÃO DE EXPIRAÇÃO REATIVADA
             if (licenseExpired) {
-                showStatusMessage("❌ CRÉDITOS EXPIRADOS! Adquira sua chave.", "var(--danger-color)"); 
+                showStatusMessage("❌ Créditos expirados. Garanta sua chave permanente.", "var(--danger-color)");
                 return; 
             }
             
@@ -744,9 +755,10 @@
         /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO TIMER APÓS O LANÇAMENTO) === */
         function startInjection(packageName, gameName) {
             
+            // Verifica se a licença expirou (permanentemente ou por tempo)
             if (licenseExpired) {
-                showStatusMessage("❌ CRÉDITOS EXPIRADOS! Adquira sua chave.", "var(--danger-color)");
-                return;
+                 showStatusMessage("❌ CRÉDITOS EXPIRADOS. Obtenha sua chave permanente.", "var(--danger-color)");
+                 return;
             }
 
             if (injectionInterval) {
@@ -829,8 +841,12 @@
 
                         overlaySubtext.innerText = `Comando de lançamento do ${gameName} enviado! O jogo deve abrir em instantes.`;
 
-                        // *** TIMER DE EXPIRAÇÃO ATIVADO: 2 MINUTOS (120000 ms) ***
+                        // *** ATIVAÇÃO DO TIMER DE EXPIRAÇÃO (2 MINUTOS) E BLOQUEIO PERMANENTE ***
+                        // Define o tempo de teste de 2 minutos (120.000 ms)
                         setTimeout(disableFunctions, 120000); 
+                        
+                        // Marca o dispositivo como "teste usado" imediatamente após o lançamento
+                        localStorage.setItem('hasUsedTrial', 'true');
 
                     }, 1500); 
                     
