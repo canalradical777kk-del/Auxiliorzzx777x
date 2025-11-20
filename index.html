@@ -515,7 +515,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.2.8V (TESTE ILIMITADO)</span>
+                <span>VERSÃO: 1.0.0.2.9V (TESTE ILIMITADO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -541,18 +541,6 @@
         // Variável de controle da pasta
         let pasta_carregada_com_sucesso = false; 
 
-        // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script.
-        // ** (REMOVIDO TEMPORARIAMENTE PARA TESTE) **
-        window.onload = function() {
-            // A lógica de bloqueio está desabilitada no modo de teste.
-            // Para reativar, descomente o bloco:
-            /*
-            if (localStorage.getItem('hasUsedTrial') === 'true') {
-                showPermanentLockScreen();
-            }
-            */
-        };
-        
         // Função para abrir o link do Telegram em uma nova aba
         function openTelegramLink() {
             // SEU LINK DO TELEGRAM
@@ -752,12 +740,12 @@
                     overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo...`;
                     successOverlay.style.display = 'flex';
                     
-                    // 2. TENTA LANÇAR O APLICATIVO COM O COMANDO SIMPLIFICADO
+                    // 2. TENTA LANÇAR O APLICATIVO COM O COMANDO CORRIGIDO
                     setTimeout(() => {
                         const appPackage = selectedGamePackage; 
                         
-                        // *** COMANDO DIRETO PARA LANÇAMENTO DO JOGO ***
-                        const launchUri = `intent://#Intent;package=${appPackage};end`;
+                        // *** COMANDO CORRIGIDO: Adiciona action e category para forçar o launch. ***
+                        const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};end`;
                         
                         window.location.href = launchUri; 
 
