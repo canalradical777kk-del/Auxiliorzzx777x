@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel Mod Menu Ultimate - PRO (V5.5)</title>
+    <title>Painel Mod Menu Ultimate - PRO</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
@@ -73,52 +73,14 @@
         }
         @keyframes lineScroll { from { background-position: 0 0; } to { background-position: 800px 800px; } }
 
-        /* === NOVO ESTILO: OVERLAY DE LICENÇA EXPIRADA (Sutil) === */
-        #license-lock {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7); /* Transparente para ver o painel atrás */
-            display: none; /* Inicia oculto */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 55; /* Acima do painel e abaixo do status/sucesso */
-            padding: 20px;
-            text-align: center;
-            border-radius: 20px; /* Adapta ao painel */
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            pointer-events: none; /* Inicia desabilitado */
-        }
-
-        #license-lock.active { 
-            display: flex; 
-            pointer-events: all; /* Bloqueia cliques quando ativo */
-        }
-        
-        .lock-card {
-            background: rgba(40, 0, 0, 0.9);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid var(--danger-color);
-            box-shadow: 0 0 15px var(--danger-color);
-            max-width: 80%;
-        }
-
-        .lock-card h3 {
-            color: var(--danger-color);
-            font-size: 20px;
-            text-shadow: 0 0 10px var(--danger-color);
-            margin-top: 0;
-        }
-
-        .lock-card p {
-            color: #ffaaaa;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        
         /* ESTADO DE CONCLUÍDO (Tela de transição) */
+        .panel-container.success-hide {
+            /* Mantém o painel visível, mas desabilitado */
+            opacity: 1; 
+            transform: scale(1);
+            pointer-events: none;
+        }
+
         #success-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -158,16 +120,44 @@
             font-size: 16px;
         }
 
-        /* Novo botão de reforço no overlay */
-        .btn-refill {
-            width: 80%; padding: 15px; margin-top: 20px; 
-            background: var(--secondary-color); border: 2px solid var(--text-color); 
-            color: var(--bg-color); border-radius: var(--ios-radius); 
-            font-weight: 800; cursor: pointer; transition: 0.3s; 
-            text-transform: uppercase; font-size: 16px; 
-            box-shadow: 0 0 20px var(--secondary-color);
+
+        /* === OVERLAY DE EXPIRAÇÃO === */
+        #expiration-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 55; 
+            padding: 20px;
+            text-align: center;
+            color: var(--danger-color);
+            animation: fadeIn 0.5s;
         }
-        .btn-refill:active { transform: scale(0.98); background: #28a745; }
+
+        #expiration-overlay.show { 
+            display: flex; 
+            pointer-events: all; 
+        }
+
+        .expiration-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--danger-color);
+        }
+        .expiration-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--danger-color);
+        }
+        .expiration-text {
+            font-size: 16px;
+            color: var(--secondary-color-text);
+        }
 
 
         /* === ABAS DE NAVEGAÇÃO === */
@@ -419,28 +409,35 @@
     <div id="success-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 50; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <div class="success-icon"><i class="fas fa-check-circle"></i></div>
         <div class="success-text">SUCESSO! INJEÇÃO 100%</div>
-        <div class="success-subtext" id="overlay-subtext">O comando de lançamento foi enviado. Se o jogo não abrir, use o botão abaixo para tentar novamente.</div>
-        <button class="btn-refill" onclick="forceLaunchApp(selectedGamePackage, selectedGameName)">
-            <i class="fas fa-gamepad"></i> TENTAR ABRIR O FREE FIRE AGORA
-        </button>
+        <div class="success-subtext" id="overlay-subtext">Comando de lançamento do jogo enviado. Mantenha o painel em segundo plano.</div>
     </div>
     
-    <div id="expiration-overlay" style="display: none !important;">
-    </div>
-    
-    <div class="panel-container" id="main-panel"> 
+    <div id="expiration-overlay">
+        <div class="expiration-icon"><i class="fas fa-lock"></i></div>
         
-        <div id="license-lock">
-            <div class="lock-card">
-                <h3>ACESSO BLOQUEADO!</h3>
-                <p>Seu tempo chegou ao fim. Seu crédito já acabou.</p>
-                <p>Seu dispositivo está bloqueado. Garanta sua chave key aqui.</p>
-                <button class="btn btn-action" style="background: var(--danger-color);" onclick="promptForNewKey()">
-                    <i class="fas fa-key"></i> GARANTIR SUA CHAVE KEY
-                </button>
-            </div>
+        <div class="expiration-title" style="color: var(--danger-color);">CRÉDITOS EXPIRADOS</div>
+        
+        <div class="expiration-text">
+            <p style="font-size:16px; color:var(--text-color); margin-bottom: 5px;">
+                Infelizmente, os **créditos de uso** da sua chave de teste expiraram.
+            </p>
+            <p style="font-size:14px; color:var(--secondary-color-text);">
+                O acesso às funções **Premium** foi bloqueado para este dispositivo.
+            </p>
+            <br>
+            <span style="font-weight: 700; color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color);">
+                GARANTA AGORA SEU ACESSO VIP PERMANENTE!
+            </span>
         </div>
+        
+        <a id="permanent-key-link" class="btn btn-action" onclick="openTelegramLink()" style="margin-top: 25px; width: 80%; cursor: pointer;">
+            <i class="fab fa-telegram-plane"></i> ENTRAR NO GRUPO VIP
+        </a>
+        <p style="font-size:12px; color:var(--secondary-color-text); margin-top:15px;">A permanência no painel requer uma chave de acesso.</p>
+    </div>
 
+    <div class="panel-container" id="main-panel">
+        
         <div class="tabs-header">
             <button class="tab-btn active" onclick="openTab('mira', this, 'MIRA', 'fa-crosshairs')">
                 <i class="fas fa-crosshairs"></i>
@@ -511,10 +508,10 @@
             <div id="pasta" class="tab-content">
                 <h3 style="text-align:center; font-size:18px; color:var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color); margin-top:0; margin-bottom:25px; font-weight: 600;">SELEÇÃO DE VERSÃO E ARQUIVOS</h3>
 
-                <button id="btn-ff-normal" class="btn" onclick="selectGame('com.dts.freefireth', 'FREE FIRE NORMAL', true)">
+                <button id="btn-ff-normal" class="btn" onclick="selectGame('com.dts.freefireth', 'FREE FIRE NORMAL')">
                     <i class="fas fa-mobile-alt"></i> FREE FIRE NORMAL
                 </button>
-                <button id="btn-ff-max" class="btn" onclick="selectGame('com.dts.freefiremax', 'FREE FIRE MAX', true)">
+                <button id="btn-ff-max" class="btn" onclick="selectGame('com.dts.freefiremax', 'FREE FIRE MAX')">
                     <i class="fas fa-desktop"></i> FREE FIRE MAX
                 </button>
 
@@ -571,11 +568,11 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.5.5V (FINAL)</span>
+                <span>VERSÃO: 1.0.0.2.5V</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
-                <span>DATA: 20/11/25</span>
+                <span>DATA: 19/11/25</span>
             </div>
         </div>
 
@@ -590,76 +587,53 @@
         let selectedGamePackage = null; 
         let selectedGameName = '';
         let injectionInterval;
+        
+        // Variável de controle de expiração
         let licenseExpired = false; 
+
+        // Variável de controle da pasta
         let pasta_carregada_com_sucesso = false; 
-        
-        /* === LÓGICA DE EXPIRAÇÃO DE TEMPO (2 MINUTOS) === */
-        const TEST_DURATION_SECONDS = 120; // 2 minutos
-        let expirationTimer;
 
-        function checkExpiration() {
-            const lockOverlay = document.getElementById('license-lock');
-            
-            // Ativa o bloqueio
-            licenseExpired = true; 
-            lockOverlay.classList.add('active'); 
-            
-            showStatusMessage("🛑 Tempo de Teste Expirou! Acesso Bloqueado. A Chave KEY acabou.", "var(--danger-color)");
-        }
-        
-        function promptForNewKey() {
-            // Chave de teste: CHAVEORIGINAL
-            const userKey = prompt("Insira a chave de acesso (KEY):");
-            
-            if (userKey && userKey.toUpperCase() === "CHAVEORIGINAL") {
-                alert("CHAVE ACEITA! Recarregando para reativar o acesso.");
-                location.reload(); 
-            } else if (userKey) {
-                alert("CHAVE INVÁLIDA ou EXPIRADA. Acesso Negado.");
+        // =================================================================
+        // FUNÇÕES DE STATUS E EXPIRAÇÃO
+        // =================================================================
+
+        // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script.
+        window.onload = function() {
+            // Oculta o overlay de expiração ao carregar, a menos que o lock esteja ativado
+            document.getElementById('expiration-overlay').style.display = 'none';
+
+            if (localStorage.getItem('hasUsedTrial') === 'true') {
+                showPermanentLockScreen();
+            } else {
+                // Seleciona o jogo normal por padrão se não houver expirado
+                 selectGame('com.dts.freefireth', 'FREE FIRE NORMAL');
             }
-        }
+        };
         
-        function startExpirationTimer() {
-            // Se o timer já estiver rodando ou a licença expirada, não faz nada.
-            if (expirationTimer || licenseExpired) return;
-
-            // Inicia a contagem regressiva de 2 minutos
-            expirationTimer = setTimeout(checkExpiration, TEST_DURATION_SECONDS * 1000); 
-            showStatusMessage(`⏰ Teste Ativado: 2 minutos de uso!`, "var(--primary-color)");
+        // Função para abrir o link do Telegram em uma nova aba
+        function openTelegramLink() {
+            // ALtere este link para o seu grupo VIP
+            const telegramURL = "https://t.me/+SF8t0VbWwFMwNWUx";
+            
+            // Abrir o link em uma nova aba forçada
+            window.open(telegramURL, '_blank').focus();
+            
+            showStatusMessage("✅ Redirecionando para o Telegram...", "var(--secondary-color)");
         }
 
-        /* === FUNÇÕES DE UTILIDADE E CONTROLE === */
-
-        function forceLaunchApp(packageName, gameName) {
-            if (!packageName) {
-                showStatusMessage("❌ Erro: Selecione a versão do jogo primeiro.", "var(--danger-color)");
-                return;
-            }
-            
-            // Comanddo de lançamento simples e direto (sem fallback para Play Store)
-            const launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${packageName};end`;
-            
-            window.location.href = launchUri; 
-
-            // Atualiza a mensagem no overlay
-            const overlaySubtext = document.getElementById('overlay-subtext');
-            if (overlaySubtext) {
-                overlaySubtext.innerText = `Comando de lançamento do ${gameName} reenviado! Use o botão se o jogo não abrir.`;
-            }
-
-            showStatusMessage(`Comando de Launch Manual enviado para ${gameName}.`, "var(--secondary-color)");
-        }
-
+        // FUNÇÃO: Exibe mensagens de status rápidas
         function showStatusMessage(message, color) {
             const messageContainer = document.getElementById('status-message-container');
             clearTimeout(statusTimeout);
             
-            messageContainer.innerText = message;
+            messageContainer.innerHTML = message; // Usa innerHTML para suportar negrito
             messageContainer.style.color = color;
-            messageContainer.style.boxShadow = `0 0 15px rgba(255, 255, 255, 0.1)`; 
+            // Cria um visual minimalista, sem background/border, só texto neon
+            messageContainer.style.boxShadow = `none`; 
             messageContainer.style.borderColor = `transparent`; 
             messageContainer.style.textShadow = `0 0 5px ${color}`; 
-            messageContainer.style.background = `rgba(0,0,0,0.8)`; 
+            messageContainer.style.background = `none`; 
             messageContainer.classList.add('show');
 
             statusTimeout = setTimeout(() => {
@@ -667,15 +641,54 @@
             }, 2500); 
         }
 
+        // FUNÇÃO: Mostra a tela de bloqueio permanente (tela inicial após uso)
+        function showPermanentLockScreen() {
+            licenseExpired = true;
+            
+            // 1. Oculta o painel principal (mantém o visual mas desabilita interação)
+            const mainPanel = document.getElementById('main-panel');
+            if (mainPanel) {
+                mainPanel.classList.add('success-hide'); 
+            }
+
+            // 2. Mostra o overlay de expiração/bloqueio
+            const expirationOverlay = document.getElementById('expiration-overlay');
+            if (expirationOverlay) {
+                expirationOverlay.classList.add('show');
+            }
+            
+            // 3. Informa o status
+            showStatusMessage("🔒 Acesso Bloqueado. Chave Requerida.", "var(--danger-color)");
+        }
+        
+        // FUNÇÃO: Define o LOCK PERMANENTE no localStorage E MANTÉM O PAINEL ABERTO
+        function disableFunctions() {
+            // 1. Define o lock permanente para que não volte a funcionar
+            localStorage.setItem('hasUsedTrial', 'true');
+            
+            // 2. Agora chama a função que exibe o bloqueio de tela (mostra a tela de expiração sobre o painel)
+            setTimeout(() => {
+                 showPermanentLockScreen();
+            }, 500); // Dá um tempo para a tela de sucesso ser vista
+
+        }
+        
+        // =================================================================
+        // FUNÇÕES DE NAVEGAÇÃO E CONTROLES
+        // =================================================================
+
+        // FUNÇÃO: Controle de Toggles
         function handleToggle(checkboxId, rowId, functionName) {
+            // VERIFICAÇÃO DE EXPIRAÇÃO
             if (licenseExpired) {
-                showStatusMessage("🛑 Chave Expirada. Acesso Negado.", "var(--danger-color)");
+                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
                 return; 
             }
             
             const checkbox = document.getElementById(checkboxId);
             const row = document.getElementById(rowId);
             
+            // Inverte o estado
             checkbox.checked = !checkbox.checked;
             const isActive = checkbox.checked;
 
@@ -688,189 +701,198 @@
             const statusText = isActive ? "ATIVADA" : "DESATIVADA";
             const statusColor = isActive ? "var(--secondary-color)" : "var(--danger-color)"; 
 
-            showStatusMessage(`${functionName} - ${statusText}`, statusColor);
+            showStatusMessage(`${functionName} - **${statusText}**`, statusColor);
         }
         
+        // FUNÇÃO: Altera o conteúdo das abas
         function openTab(tabId, element, funcName, funcIconName) {
-            const contentElements = document.querySelectorAll('.tab-content');
-            const buttonElements = document.querySelectorAll('.tab-btn');
-            const targetContent = document.getElementById(tabId);
-            const currentFuncIconSpan = document.getElementById('current-func-icon');
-            const currentFuncName = document.getElementById('current-func-name');
+            // Remove a classe 'active' de todos os botões e conteúdos
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-            contentElements.forEach(c => c.classList.remove('active'));
-            buttonElements.forEach(b => b.classList.remove('active'));
-            
-            if (targetContent) targetContent.classList.add('active');
-            if (element) element.classList.add('active');
+            // Adiciona a classe 'active' ao botão clicado e ao conteúdo correspondente
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
 
-            if (currentFuncIconSpan && funcIconName) {
-                currentFuncIconSpan.innerHTML = `<i class="fas ${funcIconName}"></i>`;
+            // Atualiza o cabeçalho da função
+            document.getElementById('current-func-name').innerText = funcName;
+            document.getElementById('current-func-icon').innerHTML = `<i class="fas ${funcIconName}"></i>`;
+
+            // Opcional: Avisa sobre o estado da pasta se estiver na aba PASTA
+            if (tabId === 'pasta') {
+                updatePastaStatus();
             }
-            if (currentFuncName) currentFuncName.innerText = funcName;
         }
 
+        // FUNÇÃO: Atualiza o valor do Slider FOV
         function updateFovValue(value) {
-            const fovDisplay = document.getElementById('fov-value');
-            if (fovDisplay) {
-                fovDisplay.innerText = value;
-            }
+            document.getElementById('fov-value').innerText = value;
+            showStatusMessage(`RAIO DE FOV ajustado para: **${value}**`, "var(--primary-color)");
         }
         
-        function selectGame(packageName, gameName, showStatus = false) {
+        // =================================================================
+        // FUNÇÕES DA ABA PASTA
+        // =================================================================
+
+        // FUNÇÃO: Seleciona o jogo para injeção
+        function selectGame(packageName, gameName) {
+            // VERIFICAÇÃO DE EXPIRAÇÃO
+            if (licenseExpired) {
+                // Não retorna, apenas mostra a mensagem e permite que a seleção visual ocorra,
+                // mas bloqueia a função de injeção mais tarde.
+                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
+            }
+            
             selectedGamePackage = packageName;
             selectedGameName = gameName;
 
-            const btnNormal = document.getElementById('btn-ff-normal');
-            const btnMax = document.getElementById('btn-ff-max');
+            // Remove a classe 'selected' de todos os botões de seleção de jogo
+            document.getElementById('btn-ff-normal').classList.remove('selected');
+            document.getElementById('btn-ff-max').classList.remove('selected');
 
-            if (btnNormal) btnNormal.classList.remove('selected');
-            if (btnMax) btnMax.classList.remove('selected');
-
-            if(packageName.includes('freefireth') && btnNormal) btnNormal.classList.add('selected');
-            if(packageName.includes('freefiremax') && btnMax) btnMax.classList.add('selected');
-
-            if (showStatus) {
-                showStatusMessage(`Versão ${gameName} SELECIONADA.`, "var(--primary-color)");
-            }
+            // Adiciona a classe 'selected' ao botão clicado
+            const clickedButton = (packageName === 'com.dts.freefireth') ? document.getElementById('btn-ff-normal') : document.getElementById('btn-ff-max');
+            clickedButton.classList.add('selected');
+            
+            showStatusMessage(`Versão Selecionada: **${gameName}**`, "var(--primary-color)");
         }
-
+        
+        // FUNÇÃO: Aciona o input de arquivo (simula carregar pasta)
         function triggerFile() {
+            // VERIFICAÇÃO DE EXPIRAÇÃO
             if (licenseExpired) {
-                showStatusMessage("🛑 Chave Expirada. Acesso Negado.", "var(--danger-color)");
+                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
                 return;
             }
-            const fileUpload = document.getElementById('file-upload');
-            if (fileUpload) {
-                fileUpload.click();
-            }
-            showStatusMessage("Aguardando seleção da pasta...", "var(--primary-color)");
+
+            // Simula o clique para seleção de diretório
+            document.getElementById('file-upload').click();
         }
 
-        document.getElementById('file-upload').addEventListener('change', function(event) {
+        // LISNER para quando um arquivo/pasta é "selecionado"
+        document.getElementById('file-upload').addEventListener('change', (event) => {
             const files = event.target.files;
-            const pastaStatus = document.getElementById('pasta-status');
-
             if (files.length > 0) {
-                pasta_carregada_com_sucesso = true; 
-                pastaStatus.innerText = `Status: Pasta carregada com ${files.length} arquivos.`;
-                pastaStatus.style.color = "var(--secondary-color)";
-                showStatusMessage(`✅ PASTA CARREGADA. ${files.length} arquivos prontos.`, "var(--secondary-color)");
+                // Simula a verificação de pasta correta
+                pasta_carregada_com_sucesso = true;
+                updatePastaStatus();
+                showStatusMessage("✅ Pasta de Recursos Carregada!", "var(--secondary-color)");
             } else {
-                pasta_carregada_com_sucesso = false; 
-                pastaStatus.innerText = "Status: Pasta de Arquivos não carregada.";
-                pastaStatus.style.color = "var(--danger-color)";
-                showStatusMessage("Seleção de pasta cancelada.", "var(--danger-color)");
+                pasta_carregada_com_sucesso = false;
+                updatePastaStatus();
             }
+            // Limpa o input para permitir que o evento 'change' seja acionado novamente
+            event.target.value = null;
         });
 
+        // FUNÇÃO: Atualiza o status de carregamento da pasta
+        function updatePastaStatus() {
+            const statusElement = document.getElementById('pasta-status');
+            if (pasta_carregada_com_sucesso) {
+                statusElement.innerText = 'Status: ✅ Pasta de Arquivos carregada com sucesso.';
+                statusElement.style.color = 'var(--secondary-color)';
+            } else {
+                statusElement.innerText = 'Status: ❌ Pasta de Arquivos não carregada.';
+                statusElement.style.color = 'var(--danger-color)';
+            }
+        }
+        
+        // =================================================================
+        // FUNÇÕES DA ABA INJECTOR
+        // =================================================================
 
-        /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO LANÇAMENTO) === */
+        // FUNÇÃO: Inicia a simulação de injeção
         function startInjection(packageName, gameName) {
-            
+            // 1. VERIFICAÇÃO DE EXPIRAÇÃO
             if (licenseExpired) {
-                showStatusMessage("🛑 Chave Expirada. Não é possível Injetar.", "var(--danger-color)");
+                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
                 return;
             }
             
-            // 1. ATIVA O TIMER DE 2 MINUTOS
-            startExpirationTimer(); 
-            
-            if (injectionInterval) {
-                clearInterval(injectionInterval);
+            // 2. VERIFICAÇÃO DE PASTA
+            if (!pasta_carregada_com_sucesso) {
+                showStatusMessage("⚠️ ERRO: Carregue a pasta de recursos primeiro!", "var(--danger-color)");
+                const pastaBtn = document.querySelector(".tab-btn[onclick*='pasta']");
+                if(pastaBtn) openTab('pasta', pastaBtn, 'PASTA', 'fa-folder-open');
+                return;
             }
-            
-            const indicator = document.getElementById('injector-status-indicator');
-            const text = document.getElementById('status-text');
-            const desc = document.getElementById('status-desc');
-            const progressBar = document.getElementById('injection-progress-bar');
-            const successOverlay = document.getElementById('success-overlay');
-            const overlaySubtext = document.getElementById('overlay-subtext');
-            
-            selectedGamePackage = packageName; 
-            selectedGameName = gameName;
-            
-            const progressSteps = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
-            const statusStates = [
-                { percent: 5, text: "Preparando ambiente...", color: "var(--primary-color)" },
-                { percent: 10, text: "INICIANDO VARREDURA ANTIBAN...", color: "var(--secondary-color)" },
-                { percent: 15, text: "Ativando Modulo RTT...", color: "var(--secondary-color)" },
-                { percent: 20, text: "BYPASS DE SEGURANÇA: Ativando KERNEL I/O.", color: "var(--primary-color)" },
-                { percent: 25, text: "Verificando integridade...", color: "var(--primary-color)" },
-                { percent: 30, text: "BLOQUEIO DE TRAÇOS Ativo (30%).", color: "var(--secondary-color)" },
-                { percent: 35, text: "Análise de Arquivos OBB.", color: "var(--primary-color)" },
-                { percent: 40, text: "Injeção de Módulo: Anti-Report.", color: "var(--secondary-color)" },
-                { percent: 45, text: "Injeção de Módulo: Aim-Assist.", color: "var(--secondary-color)" },
-                { percent: 50, text: "Processo em 50%. Estabilizando...", color: "var(--primary-color)" },
-                { percent: 55, text: "Injetando Modulos CRÍTICOS (55%).", color: "var(--secondary-color)" },
-                { percent: 60, text: "Ajustando sensibilidade...", color: "var(--primary-color)" },
-                { percent: 65, text: "Desvio de segurança concluído.", color: "var(--secondary-color)" },
-                { percent: 70, text: "Injeção de Módulo: RENDER HD.", color: "var(--primary-color)" },
-                { percent: 75, text: "Injeção de Módulo: FOV Máximo.", color: "var(--primary-color)" },
-                { percent: 80, text: "SINCRONIZANDO dados finais...", color: "var(--secondary-color)" },
-                { percent: 85, text: "Otimizando recursos (85%).", color: "var(--primary-color)" },
-                { percent: 90, text: "Finalizando Injeção - 90%.", color: "var(--secondary-color)" },
-                { percent: 95, text: "Limpeza de rastros finalizada.", color: "var(--primary-color)" },
-                { percent: 100, text: `INJEÇÃO CONCLUÍDA! Lançando o ${gameName}...`, color: "var(--secondary-color)" } 
-            ];
 
-            // 2. Resetar e Iniciar a injeção visual
-            indicator.style.backgroundColor = 'var(--primary-color)';
-            indicator.style.boxShadow = '0 0 8px var(--primary-color)';
-            text.innerText = `INICIANDO INJEÇÃO: ${gameName}`;
-            desc.innerText = "Executando etapas...";
+            // 3. INICIALIZAÇÃO DO PROCESSO
+            clearInterval(injectionInterval);
+            let progress = 0;
+            const progressBar = document.getElementById('injection-progress-bar');
+            const statusText = document.getElementById('status-text');
+            const statusDesc = document.getElementById('status-desc');
+            const indicator = document.getElementById('injector-status-indicator');
+            
+            statusText.innerText = `INICIANDO INJEÇÃO (${gameName})...`;
+            statusDesc.innerText = 'Conectando ao servidor e inicializando bypass...';
             progressBar.style.width = '0%';
             progressBar.style.backgroundColor = 'var(--primary-color)';
-
+            indicator.style.backgroundColor = 'var(--primary-color)';
+            indicator.style.boxShadow = `0 0 8px var(--primary-color)`;
+            
+            let steps = [
+                { progress: 20, desc: 'Bypass ativo. Injetando DLL principal.' },
+                { progress: 45, desc: 'Integrando arquivos OBB/Data: Modo 360.' },
+                { progress: 70, desc: 'Otimização de Renderização HD e FPS Boost.' },
+                { progress: 95, desc: 'Verificando Hash de segurança. Quase pronto...' }
+            ];
             let stepIndex = 0;
             
             injectionInterval = setInterval(() => {
-                const currentProgress = progressSteps[stepIndex];
-                progressBar.style.width = `${currentProgress}%`;
-
-                const currentState = statusStates.find(s => s.percent === currentProgress);
-                if (currentState) {
-                    text.innerText = currentState.text;
-                    progressBar.style.backgroundColor = currentState.color;
-                }
-                
-                if (currentProgress === 100) {
-                    desc.innerText = "Processo finalizado com sucesso. Otimização aplicada.";
-                    clearInterval(injectionInterval); 
-                    indicator.style.backgroundColor = 'var(--secondary-color)';
-                    indicator.style.boxShadow = '0 0 8px var(--secondary-color)';
-                    
-                    // 3. O sucesso aparece.
-                    successOverlay.style.display = 'flex';
-                    
-                    // 4. TENTA LANÇAR O APLICATIVO COM LÓGICA CONDICIONAL (V5.2)
-                    const appPackage = selectedGamePackage; 
-                    let launchUri;
-                    let successMessage;
-
-                    if (appPackage === 'com.dts.freefireth') {
-                        // LANÇAMENTO DIRETO (FF Normal)
-                        launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};end`;
-                        successMessage = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo diretamente...`;
-
-                    } else if (appPackage === 'com.dts.freefiremax') {
-                        // LANÇAMENTO COM FALLBACK (FF MAX - Play Store)
-                        const storeUrl = `https://play.google.com/store/apps/details?id=${appPackage}`;
-                        launchUri = `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${appPackage};S.browser_fallback_url=${encodeURIComponent(storeUrl)};end`;
-                        successMessage = `O jogo ${gameName} foi injetado. Tentando abrir (pode abrir a Play Store).`;
+                if (progress < 100) {
+                    // Atualiza a descrição
+                    if (stepIndex < steps.length && progress >= steps[stepIndex].progress) {
+                        statusDesc.innerText = steps[stepIndex].desc;
+                        stepIndex++;
                     }
-
-                    document.getElementById('overlay-subtext').innerText = successMessage;
                     
-                    window.location.href = launchUri; 
+                    // Aumenta o progresso de forma irregular para simular processamento
+                    progress += 1 + Math.random() * 2; 
+                    if (progress > 100) progress = 100;
 
-                    return; 
+                    progressBar.style.width = progress + '%';
+                    
+                    if (progress >= 90) {
+                        // Muda a cor para verde no final
+                        progressBar.style.backgroundColor = 'var(--secondary-color)';
+                    }
+                    
+                    // 4. CONCLUSÃO
+                    if (progress === 100) {
+                        clearInterval(injectionInterval);
+                        statusText.innerText = 'INJEÇÃO CONCLUÍDA!';
+                        statusDesc.innerText = `Pronto para ${gameName}. Iniciando processo de pós-injeção...`;
+                        indicator.style.backgroundColor = 'var(--secondary-color)';
+                        indicator.style.boxShadow = `0 0 8px var(--secondary-color)`;
+                        
+                        // Exibe a tela de sucesso e aplica o bloqueio permanente
+                        showSuccessOverlay(gameName); 
+                    }
                 }
-
-                stepIndex++;
-            }, 300); 
+            }, 150); 
         }
 
+        // FUNÇÃO: Exibe a tela de sucesso (e aciona o bloqueio)
+        function showSuccessOverlay(gameName) {
+            const overlay = document.getElementById('success-overlay');
+            const subtext = document.getElementById('overlay-subtext');
+            
+            subtext.innerHTML = `O Mod Menu para **${gameName}** foi ativado. Você será bloqueado após 5 segundos, use rapidamente!`;
+            overlay.classList.add('show');
+            
+            // Aplica o bloqueio 5 segundos após a injeção
+            setTimeout(() => {
+                 overlay.classList.remove('show');
+                 disableFunctions();
+            }, 5000); 
+        }
     </script>
+
 </body>
 </html>
