@@ -74,10 +74,11 @@
         @keyframes lineScroll { from { background-position: 0 0; } to { background-position: 800px 800px; } }
 
         /* ESTADO DE CONCLUÍDO (Tela de transição) */
-        /* REMOVIDO: Mantemos o painel visível, mas coberto pelo overlay de expiração */
         .panel-container.success-hide {
-             opacity: 1; 
-             transform: scale(1);
+            /* Mantém o painel visível, mas desabilitado */
+            opacity: 1; 
+            transform: scale(1);
+            pointer-events: none;
         }
 
         #success-overlay {
@@ -120,42 +121,10 @@
         }
 
 
-        /* === OVERLAY DE EXPIRAÇÃO === */
+        /* === OVERLAY DE EXPIRAÇÃO (REMOVÍDO TEMPORARIAMENTE) === */
         #expiration-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            display: none; 
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 55; /* Deve estar ACIMA do painel principal (z-index: 1) */
-            padding: 20px;
-            text-align: center;
-            color: var(--danger-color);
-            animation: fadeIn 0.5s;
-        }
-
-        #expiration-overlay.show { 
-            display: flex; 
-            pointer-events: all; 
-        }
-
-        .expiration-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px var(--danger-color);
-        }
-        .expiration-title {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px var(--danger-color);
-        }
-        .expiration-text {
-            font-size: 16px;
-            color: var(--secondary-color-text);
+            /* Está mantido na estrutura, mas nunca será exibido no modo de teste */
+            display: none !important; 
         }
 
 
@@ -408,31 +377,10 @@
     <div id="success-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 50; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <div class="success-icon"><i class="fas fa-check-circle"></i></div>
         <div class="success-text">SUCESSO! INJEÇÃO 100%</div>
-        <div class="success-subtext" id="overlay-subtext">Acesso de Teste Concedido. O comando de lançamento do jogo foi enviado.</div>
+        <div class="success-subtext" id="overlay-subtext">Acesso de Teste Ilimitado. O comando de lançamento do jogo foi enviado.</div>
     </div>
     
-    <div id="expiration-overlay">
-        <div class="expiration-icon"><i class="fas fa-lock"></i></div>
-        
-        <div class="expiration-title" style="color: var(--danger-color);">CRÉDITOS EXPIRADOS</div>
-        
-        <div class="expiration-text">
-            <p style="font-size:16px; color:var(--text-color); margin-bottom: 5px;">
-                Infelizmente, o seu **tempo de uso** expirou.
-            </p>
-            <p style="font-size:14px; color:var(--secondary-color-text);">
-                O acesso às funções foi bloqueado para este dispositivo.
-            </p>
-            <br>
-            <span style="font-weight: 700; color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color);">
-                GARANTA AGORA SEU ACESSO VIP PERMANENTE!
-            </span>
-        </div>
-        
-        <a id="permanent-key-link" class="btn btn-action" onclick="openTelegramLink()" style="margin-top: 25px; width: 80%; cursor: pointer;">
-            <i class="fab fa-telegram-plane"></i> ENTRAR NO GRUPO VIP
-        </a>
-        <p style="font-size:12px; color:var(--secondary-color-text); margin-top:15px;">A permanência no painel requer uma chave de acesso.</p>
+    <div id="expiration-overlay" style="display: none !important;">
     </div>
 
     <div class="panel-container" id="main-panel">
@@ -567,7 +515,7 @@
         <div class="footer-info">
             <div class="footer-row">
                 <span>STATUS DO SERVIDOR: <span class="online-tag">ONLINE</span></span>
-                <span>VERSÃO: 1.0.0.2.8V (TESTE: 2 MINUTOS)</span>
+                <span>VERSÃO: 1.0.0.2.8V (TESTE ILIMITADO)</span>
             </div>
             <div class="footer-row" style="margin-bottom: 0;">
                 <span>DESENVOLVEDOR: RzzX</span>
@@ -587,32 +535,27 @@
         let selectedGameName = '';
         let injectionInterval;
         
-        // Variável de controle de expiração
+        // NO MODO DE TESTE ILIMITADO, O BLOQUEIO ESTÁ DESABILITADO
         let licenseExpired = false; 
 
         // Variável de controle da pasta
         let pasta_carregada_com_sucesso = false; 
 
-        // =================================================================
-        // FUNÇÕES DE STATUS E EXPIRAÇÃO (BLOQUEIO DE USO ÚNICO)
-        // =================================================================
-
         // AÇÃO: Verifica se o dispositivo já usou o teste ao carregar o script.
+        // ** (REMOVIDO TEMPORARIAMENTE PARA TESTE) **
         window.onload = function() {
-            // Oculta o overlay de expiração ao carregar, a menos que o lock esteja ativado
-            document.getElementById('expiration-overlay').style.display = 'none';
-
+            // A lógica de bloqueio está desabilitada no modo de teste.
+            // Para reativar, descomente o bloco:
+            /*
             if (localStorage.getItem('hasUsedTrial') === 'true') {
                 showPermanentLockScreen();
-            } else {
-                 // Seleciona o jogo normal por padrão se não houver expirado
-                 selectGame('com.dts.freefireth', 'FREE FIRE NORMAL');
             }
+            */
         };
         
-        // Função para abrir o link do Telegram em uma nova aba (MUDE ESTE LINK)
+        // Função para abrir o link do Telegram em uma nova aba
         function openTelegramLink() {
-            // ALtere este link para o seu grupo VIP
+            // SEU LINK DO TELEGRAM
             const telegramURL = "https://t.me/+SF8t0VbWwFMwNWUx";
             
             // Abrir o link em uma nova aba forçada
@@ -621,12 +564,11 @@
             showStatusMessage("✅ Redirecionando para o Telegram...", "var(--secondary-color)");
         }
 
-        // FUNÇÃO: Exibe mensagens de status rápidas
         function showStatusMessage(message, color) {
             const messageContainer = document.getElementById('status-message-container');
             clearTimeout(statusTimeout);
             
-            messageContainer.innerHTML = message; 
+            messageContainer.innerText = message;
             messageContainer.style.color = color;
             messageContainer.style.boxShadow = `none`; 
             messageContainer.style.borderColor = `transparent`; 
@@ -636,49 +578,23 @@
 
             statusTimeout = setTimeout(() => {
                 messageContainer.classList.remove('show');
-            }, 2500); 
+            // MODIFICAÇÃO: O valor de 2500 foi aumentado para um período muito longo (999999999 ms)
+            // para que a mensagem de status não feche automaticamente, conforme solicitado.
+            }, 999999999); 
         }
-
-        // FUNÇÃO: Mostra a tela de bloqueio permanente (COM O ARQUIVO ABERTO)
-        function showPermanentLockScreen() {
-            licenseExpired = true;
-            
-            // 1. O painel principal (main-panel) continua visível
-            // 2. Mostra o overlay de expiração/bloqueio COBRINDO o painel
-            const expirationOverlay = document.getElementById('expiration-overlay');
-            if (expirationOverlay) {
-                expirationOverlay.classList.add('show');
-            }
-            
-            // 3. Informa o status
-            showStatusMessage("🔒 Acesso Bloqueado. Chave Requerida.", "var(--danger-color)");
-        }
-        
-        // FUNÇÃO: Define o LOCK PERMANENTE no localStorage
-        function disableFunctions() {
-            // 1. Define o lock permanente para que não volte a funcionar
-            localStorage.setItem('hasUsedTrial', 'true');
-            
-            // 2. Agora chama a função que exibe o bloqueio de tela 
-            showPermanentLockScreen();
-        }
-        
-        // =================================================================
-        // FUNÇÕES DE NAVEGAÇÃO E CONTROLES
-        // =================================================================
 
         // FUNÇÃO: Controle de Toggles
         function handleToggle(checkboxId, rowId, functionName) {
-            // 1. VERIFICAÇÃO DE EXPIRAÇÃO
+            // VERIFICAÇÃO DE EXPIRAÇÃO (REMOVIDO TEMPORARIAMENTE)
             if (licenseExpired) {
-                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
+                // Esta função está desabilitada no modo de teste
+                // showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
                 return; 
             }
             
             const checkbox = document.getElementById(checkboxId);
             const row = document.getElementById(rowId);
             
-            // Inverte o estado
             checkbox.checked = !checkbox.checked;
             const isActive = checkbox.checked;
 
@@ -691,12 +607,10 @@
             const statusText = isActive ? "ATIVADA" : "DESATIVADA";
             const statusColor = isActive ? "var(--secondary-color)" : "var(--danger-color)"; 
 
-            showStatusMessage(`${functionName} - **${statusText}**`, statusColor);
+            showStatusMessage(`${functionName} - ${statusText}`, statusColor);
         }
         
         function openTab(tabId, element, funcName, funcIconName) {
-            // Oculta o overlay de expiração se estiver ativo, mas se estiver expirado, não deixa usar as funções.
-            
             const contentElements = document.querySelectorAll('.tab-content');
             const buttonElements = document.querySelectorAll('.tab-btn');
             const targetContent = document.getElementById(tabId);
@@ -715,52 +629,32 @@
             if (currentFuncName) currentFuncName.innerText = funcName;
         }
 
-        // FUNÇÃO: Atualiza o valor do Slider FOV
         function updateFovValue(value) {
-            document.getElementById('fov-value').innerText = value;
-            if(!licenseExpired) showStatusMessage(`RAIO DE FOV ajustado para: **${value}**`, "var(--primary-color)");
+            const fovDisplay = document.getElementById('fov-value');
+            if (fovDisplay) {
+                fovDisplay.innerText = value;
+            }
         }
         
-        // =================================================================
-        // FUNÇÕES DA ABA PASTA
-        // =================================================================
-
-        // FUNÇÃO: Seleciona o jogo para injeção
         function selectGame(packageName, gameName, showStatus = false) {
-            // 1. VERIFICAÇÃO DE EXPIRAÇÃO
-            if (licenseExpired) {
-                if(showStatus) showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
-                return;
-            }
-            
             selectedGamePackage = packageName;
             selectedGameName = gameName;
 
-            // Remove a classe 'selected' de todos os botões de seleção de jogo
             const btnNormal = document.getElementById('btn-ff-normal');
             const btnMax = document.getElementById('btn-ff-max');
 
             if (btnNormal) btnNormal.classList.remove('selected');
             if (btnMax) btnMax.classList.remove('selected');
 
-            // Adiciona a classe 'selected' ao botão clicado
-            const clickedButton = (packageName === 'com.dts.freefireth') ? btnNormal : btnMax;
-            if (clickedButton) clickedButton.classList.add('selected');
-            
+            if(packageName.includes('freefireth') && btnNormal) btnNormal.classList.add('selected');
+            if(packageName.includes('freefiremax') && btnMax) btnMax.classList.add('selected');
+
             if (showStatus) {
-                showStatusMessage(`Versão Selecionada: **${gameName}**`, "var(--primary-color)");
+                showStatusMessage(`Versão ${gameName} SELECIONADA.`, "var(--primary-color)");
             }
         }
-        
-        // FUNÇÃO: Aciona o input de arquivo (simula carregar pasta)
-        function triggerFile() {
-            // 1. VERIFICAÇÃO DE EXPIRAÇÃO
-            if (licenseExpired) {
-                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
-                return;
-            }
 
-            // Simula o clique para seleção de diretório
+        function triggerFile() {
             const fileUpload = document.getElementById('file-upload');
             if (fileUpload) {
                 fileUpload.click();
@@ -768,54 +662,38 @@
             showStatusMessage("Aguardando seleção da pasta...", "var(--primary-color)");
         }
 
-        // LISNER para quando um arquivo/pasta é "selecionado"
         document.getElementById('file-upload').addEventListener('change', function(event) {
             const files = event.target.files;
             const pastaStatus = document.getElementById('pasta-status');
 
             if (files.length > 0) {
                 pasta_carregada_com_sucesso = true; 
-                pastaStatus.innerText = `Status: ✅ Pasta carregada com ${files.length} arquivos.`;
+                pastaStatus.innerText = `Status: Pasta carregada com ${files.length} arquivos.`;
                 pastaStatus.style.color = "var(--secondary-color)";
                 showStatusMessage(`✅ PASTA CARREGADA. ${files.length} arquivos prontos.`, "var(--secondary-color)");
             } else {
                 pasta_carregada_com_sucesso = false; 
-                pastaStatus.innerText = "Status: ❌ Pasta de Arquivos não carregada.";
+                pastaStatus.innerText = "Status: Pasta de Arquivos não carregada.";
                 pastaStatus.style.color = "var(--danger-color)";
                 showStatusMessage("Seleção de pasta cancelada.", "var(--danger-color)");
             }
-             // Limpa o input para permitir que o evento 'change' seja acionado novamente
-            event.target.value = null;
         });
-        
-        // =================================================================
-        // FUNÇÕES DA ABA INJECTOR
-        // =================================================================
 
-        // FUNÇÃO: Inicia a simulação de injeção
+
+        /* === FUNÇÃO DE INJEÇÃO (INÍCIO DO TIMER APÓS O LANÇAMENTO) === */
         function startInjection(packageName, gameName) {
-            // 1. VERIFICAÇÃO DE EXPIRAÇÃO
-            if (licenseExpired) {
-                showPermanentLockScreen(); // Garante que a tela de bloqueio esteja na frente
-                showStatusMessage("❌ Expiração! Garanta sua chave permanente.", "var(--danger-color)");
-                return;
+            
+            // A verificação de expiração está desabilitada (licenseExpired = false)
+
+            if (injectionInterval) {
+                clearInterval(injectionInterval);
             }
             
-            // 2. VERIFICAÇÃO DE PASTA
-            if (!pasta_carregada_com_sucesso) {
-                showStatusMessage("⚠️ ERRO: Carregue a pasta de recursos primeiro!", "var(--danger-color)");
-                const pastaBtn = document.querySelector(".tab-btn[onclick*='pasta']");
-                if(pastaBtn) openTab('pasta', pastaBtn, 'PASTA', 'fa-folder-open');
-                return;
-            }
-
-            // 3. INICIALIZAÇÃO DO PROCESSO
-            if (injectionInterval) clearInterval(injectionInterval);
-
             const indicator = document.getElementById('injector-status-indicator');
             const text = document.getElementById('status-text');
             const desc = document.getElementById('status-desc');
             const progressBar = document.getElementById('injection-progress-bar');
+            const mainPanel = document.getElementById('main-panel');
             const successOverlay = document.getElementById('success-overlay');
             const overlaySubtext = document.getElementById('overlay-subtext');
             
@@ -846,7 +724,7 @@
                 { percent: 100, text: `INJEÇÃO CONCLUÍDA! Lançando o ${gameName}...`, color: "var(--secondary-color)" } 
             ];
 
-            // 4. Resetar e Iniciar
+            // 1. Resetar e Iniciar
             indicator.style.backgroundColor = 'var(--primary-color)';
             indicator.style.boxShadow = '0 0 8px var(--primary-color)';
             text.innerText = `INICIANDO INJEÇÃO: ${gameName}`;
@@ -872,42 +750,32 @@
                     indicator.style.backgroundColor = 'var(--secondary-color)';
                     indicator.style.boxShadow = '0 0 8px var(--secondary-color)';
                     
-                    // 5. Exibir tela de sucesso e lançar o jogo
-                    showSuccessAndLaunch(gameName); 
+                    // 1. O sucesso aparece.
+                    overlaySubtext.innerText = `O jogo ${gameName} foi injetado com 100% de sucesso. Tentando abrir o aplicativo...`;
+                    successOverlay.style.display = 'flex';
+                    
+                    // 2. TENTA LANÇAR O APLICATIVO COM O COMANDO SIMPLIFICADO
+                    setTimeout(() => {
+                        const appPackage = selectedGamePackage; 
+                        
+                        // *** COMANDO DIRETO PARA LANÇAMENTO DO JOGO ***
+                        const launchUri = `intent://#Intent;package=${appPackage};end`;
+                        
+                        window.location.href = launchUri; 
+
+                        overlaySubtext.innerText = `Comando de lançamento do ${gameName} enviado! O jogo deve abrir em instantes.`;
+
+                        // *** TIMER DE EXPIRAÇÃO REMOVIDO PARA TESTES ***
+                        // Para reabilitar, insira: 
+                        // setTimeout(disableFunctions, 60000); // 60 segundos
+
+                    }, 1500); 
                     
                     return; 
                 }
 
                 stepIndex++;
             }, 300); 
-        }
-
-        // FUNÇÃO: Exibe a tela de sucesso e lança o app, configurando o timer de 2 minutos
-        function showSuccessAndLaunch(gameName) {
-            const successOverlay = document.getElementById('success-overlay');
-            const overlaySubtext = document.getElementById('overlay-subtext');
-            const appPackage = selectedGamePackage; 
-
-            // Exibir a tela de sucesso
-            overlaySubtext.innerHTML = `O jogo **${gameName}** foi injetado com 100% de sucesso. Tentando abrir o aplicativo... <br><br><span style="color:var(--danger-color); font-weight:700;">AVISO: O teste expira em 2 minutos!</span>`;
-            successOverlay.classList.add('show');
-            
-            // TENTA LANÇAR O APLICATIVO COM O COMANDO SIMPLIFICADO
-            setTimeout(() => {
-                // *** COMANDO DIRETO PARA LANÇAMENTO DO JOGO ***
-                const launchUri = `intent://#Intent;package=${appPackage};end`;
-                window.location.href = launchUri; 
-
-                overlaySubtext.innerHTML = `Comando de lançamento do **${gameName}** enviado! O jogo deve abrir em instantes. <br><br><span style="color:var(--danger-color); font-weight:700;">AVISO: O teste expira em 2 minutos!</span>`;
-
-                // *** TEMPORIZADOR DE EXPIRAÇÃO: 2 MINUTOS (120000 ms) ***
-                // Depois de 2 minutos, aplica o bloqueio permanente e mostra a tela de "CRÉDITOS EXPIRADOS"
-                setTimeout(() => {
-                    successOverlay.classList.remove('show'); // Esconde a tela de sucesso
-                    disableFunctions(); // Aplica o lock e mostra o overlay de expiração sobre o painel
-                }, 120000); 
-
-            }, 1500); 
         }
 
     </script>
